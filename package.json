@@ -1,0 +1,31 @@
+{
+  "name": "LaserTagWeb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "12.17.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegomarvid/LaserTagWeb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diegomarvid/LaserTagWeb/issues"
+  },
+  "homepage": "https://github.com/diegomarvid/LaserTagWeb#readme",
+  "dependencies": {
+    "bufferutil": "^4.0.3",
+    "express": "^4.17.1",
+    "mqtt": "^4.2.8",
+    "utf-8-validate": "^5.0.5",
+    "ws": "^7.5.3"
+  }
+}
