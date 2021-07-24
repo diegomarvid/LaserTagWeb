@@ -16,14 +16,37 @@ client.on("connect", function(){
     console.log("connected:  " + client.connected);
 })
 
-const topic_o = "LaserTag/ranking";
+const root_topic = "LaserTag/";
 
-client.subscribe(topic_o);
+let DiedTopic = root_topic + "Died";
+let SendDamageTakenTopic = root_topic + "SendDamageTaken";
+let SendDamageTopic = root_topic + "SendDamage";
 
+client.subscribe(DiedTopic);
+client.subscribe(SendDamageTakenTopic);
+
+
+let PLAYERS_NUMBER = 2;
+
+let players_died = 0;
 
 let payload;
 
 client.on('message', function(topic, message, packet){
+    
     payload = JSON.parse(message)
-	console.log(payload)
+    console.log(topic);
+	console.log(payload);
+
+    if(topic == DiedTopic){
+       players_died++;
+
+        if(players_died == PLAYERS_NUMBER - 1)
+        {
+            client.publish(SendDamageTopic, "");
+            players_died = 0;
+        }
+        
+    }
+
 });
