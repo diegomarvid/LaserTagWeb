@@ -10,7 +10,7 @@ const INDEX = '/index.html';
 
 const app = express();
 
-app.post("/post", (req, res) => {
+app.post("/", (req, res) => {
     console.log("Connected to React");
     res.redirect("/");
   });
