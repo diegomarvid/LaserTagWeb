@@ -1,5 +1,7 @@
 const express = require('express');
 var mqtt = require('mqtt');
+const cors = require('cors');
+const path = require('path')
 
 const PORT = process.env.PORT || 8080;
 const INDEX = '/index.html';
@@ -10,11 +12,19 @@ const INDEX = '/index.html';
 
 const app = express();
 
+app.use(express.json())
+app.use(cors());
+
+app.use(express.static(path.join(__dirname, 'client', 'build')))
+
 app.post("/", (req, res) => {
     console.log("Connected to React");
     res.redirect("/");
-  });
-    
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
     
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 

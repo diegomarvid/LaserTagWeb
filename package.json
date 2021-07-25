@@ -24,6 +24,7 @@
   "homepage": "https://github.com/diegomarvid/LaserTagWeb#readme",
   "dependencies": {
     "bufferutil": "^4.0.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "mqtt": "^4.2.8",
     "utf-8-validate": "^5.0.5",
