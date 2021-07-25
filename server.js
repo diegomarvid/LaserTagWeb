@@ -1,12 +1,23 @@
 const express = require('express');
 var mqtt = require('mqtt');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const INDEX = '/index.html';
 
-const server = express()
-  .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
-  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+// const server = express()
+//   .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+//   .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const app = express();
+
+app.post("/post", (req, res) => {
+    console.log("Connected to React");
+    res.redirect("/");
+  });
+    
+    
+app.listen(PORT, console.log(`Server started on port ${PORT}`));
+
 
 const url = 'mqtt://broker.hivemq.com';
 
