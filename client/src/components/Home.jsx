@@ -11,9 +11,13 @@ function Home()
     const [TotalDamages, setTotalDamages] = useState([]);
     const [chartData, setChartData] = useState({})
 
-
+    const playersNames = [{id: 'c', name: "Diego"}, {id: 'a', name: "Otte"},{id: 'b', name: "Claudio"},{id: 'd', name: "Torreta"}]
     useEffect( () => {
 
+
+        const sendPlayersNames = async () => {
+            const res = await axios.post('/api/PlayersNames', {names: playersNames});
+        }
     
         const receiveTotalDamages = async () => {
             const res = await axios.post("/api/TotalDamage");
@@ -37,6 +41,7 @@ function Home()
         };
 
         receiveTotalDamages()
+        // sendPlayersNames()
 
     
     },[])

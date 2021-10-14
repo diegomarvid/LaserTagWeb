@@ -93,6 +93,22 @@ main().catch(console.error);
 
 //************************** EXPRESS ************************************//
 
+app.post('/api/PlayersNames', (req, res) => 
+{
+
+    const PlayersNames = req.body.names;
+
+    console.log(PlayersNames);
+
+    try {
+        db.collection("Players").insertMany(PlayersNames);
+     } catch (e) {
+        print (e);
+     }
+
+
+});
+
 app.post('/api/TotalDamage', (req, res) => 
 {    
     let total_damages = [];
@@ -106,21 +122,15 @@ app.post('/api/TotalDamage', (req, res) =>
             return;
         } 
 
-        // console.log(result);
-
         //Recorro cada resultado de Hit
         for(let i in result)
         {
             let player = result[i];
 
-            // console.log(player)
-
             //Recorro los golpes que recibio cada jugador
             for(let j in player.Hits)
             {
                 let player_hit = player.Hits[j];
-
-                // console.log(player_hit)
     
                 //Me fijo si ya esta en la lista de damage
                 player_damage_index = total_damages.findIndex(x => x.id === player_hit.id);
@@ -139,7 +149,9 @@ app.post('/api/TotalDamage', (req, res) =>
 
         }   
           
-    //    console.log(total_damages);
+       //Ordenar por mayor damage 
+       total_damages = total_damages.sort((player1, player2) => player2.damage - player1.damage) 
+       //Mandar el resultado
        res.send(total_damages);
     });
 
@@ -233,6 +245,11 @@ function HandleSendDamageTakenTopic()
         let newPayload = ChangePayloadIDToNames(payload, PlayersNames)
 
         console.log(newPayload)
+
+        db.collection("Hits").insertOne(newPayload,function(err, result) {
+            if (err) throw err;
+            console.log("Success inserting hit");
+        });
 
 
     })
