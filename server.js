@@ -2,6 +2,7 @@ const express = require('express');
 var mqtt = require('mqtt');
 const cors = require('cors');
 const path = require('path');
+var randomColor = require('randomcolor');
 
 const MongoClient = require('mongodb').MongoClient;
 
@@ -27,7 +28,6 @@ app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 // ************************* MONGO DB ******************************** //
 
-let total_damages = [];
 
 let db;
 
@@ -42,9 +42,6 @@ async function main(){
         client_mongodb = await MongoClient.connect(uri);
 
         console.log("Connected to MongoDB successfully")
-  
-        await listDatabases(client_mongodb);
-  
   
         db = client_mongodb.db("Turret");
 
@@ -62,25 +59,19 @@ async function main(){
         //     console.log("Success inserting hit");
         // });
 
-        GetTotalDamages();
         // console.log(total_damages);
     
 
-    db.collection("Hits").findOne({id:'c'},function(err, result) {
+        // db.collection("Hits").findOne({id:'c'},function(err, result) {
     
-        if (err) throw err;
+        //     if (err) throw err;
 
-        if(result == null) {
-            console.log("No se encontraron hits correspondientes");
-            return;
-        } 
-
+        //     if(result == null) {
+        //         console.log("No se encontraron hits correspondientes");
+        //         return;
+        //     } 
         
-
-        // console.log(result.Hits);
-        
-
-    });
+        // });
         
         
     } catch (e) {
@@ -97,9 +88,15 @@ async function listDatabases(client){
     databasesList.databases.forEach(db => console.log(` - ${db.name}`));
 };
 
-async function GetTotalDamages()
-{
-    
+
+main().catch(console.error);
+
+//************************** EXPRESS ************************************//
+
+app.post('/api/TotalDamage', (req, res) => 
+{    
+    let total_damages = [];
+
     db.collection("Hits").find({}).toArray(function(err, result) {
     
         if (err) throw err;
@@ -128,6 +125,8 @@ async function GetTotalDamages()
                 //Me fijo si ya esta en la lista de damage
                 player_damage_index = total_damages.findIndex(x => x.id === player_hit.id);
 
+                player_hit.color = randomColor();
+
                 //Si no esta lo agrego
                 if(player_damage_index == -1)
                 {
@@ -140,16 +139,11 @@ async function GetTotalDamages()
 
         }   
           
-       console.log(total_damages);
+    //    console.log(total_damages);
+       res.send(total_damages);
     });
 
-}
-  
-  main().catch(console.error);
-
-  
-
-
+})
 
 // ************************* MQTT ************************************ //
 
@@ -209,10 +203,41 @@ function HandleDieTopic()
     }
 }
 
+function GetNameById(id, playersNames)
+{
+    return playersNames.find(player => player.id == id).name;
+}
+
+function ChangePayloadIDToNames(payload, playersNames)
+{
+    let newPayload = payload;
+
+    newPayload.id = GetNameById(payload.id, playersNames);
+
+    for(let i in payload.Hits)
+    {
+        newPayload.Hits[i].id = GetNameById(payload.Hits[i].id, playersNames);
+    }
+
+    return newPayload;
+}
+
 function HandleSendDamageTakenTopic()
 {
     console.log("Guardando tu damage en db...");
-    // console.log(payload.Hits)
+
+    db.collection("Players").find({}).toArray(function(err, result) {
+
+        let PlayersNames = result;
+     
+        let newPayload = ChangePayloadIDToNames(payload, PlayersNames)
+
+        console.log(newPayload)
+
+
+    })
+
+
 }
 
 const hit = {
@@ -228,8 +253,8 @@ const hit = {
 //   { 
 //     "id": "c",
 //     "Hits": [
-//       { "id": "a", "damage": 20 },
-//       { "id": "b", "damage": 66 },
-//       { "id": "d", "damage": 11 }
+//       { "id": "a", "damage": 10 },
+//       { "id": "b", "damage": 5 },
+//       { "id": "d", "damage": 1 }
 //     ]
 //   }
