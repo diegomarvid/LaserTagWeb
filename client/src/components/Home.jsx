@@ -1,8 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios'
 import {Chart} from './Chart'
-// var randomColor = require('randomcolor');
-
 
 
 function Home()
@@ -41,7 +39,7 @@ function Home()
         };
 
         receiveTotalDamages()
-        // sendPlayersNames()
+        //sendPlayersNames()
 
     
     },[])

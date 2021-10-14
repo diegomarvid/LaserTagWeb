@@ -98,62 +98,117 @@ app.post('/api/PlayersNames', (req, res) =>
 
     const PlayersNames = req.body.names;
 
-    console.log(PlayersNames);
+    //console.log(PlayersNames);
 
-    try {
-        db.collection("Players").insertMany(PlayersNames);
-     } catch (e) {
-        print (e);
-     }
+    //Add colors
+    for(let i in PlayersNames)
+    {
+        PlayersNames[i].color = randomColor();
+    }
+
+   // console.log(PlayersNames);
+
+    // try {
+    //     db.collection("Players").insertMany(PlayersNames);
+    //  } catch (e) {
+    //     print (e);
+    //  }
 
 
 });
 
-app.post('/api/TotalDamage', (req, res) => 
-{    
+function CreateTotalDamageArrayFromHits(hits)
+{
+
     let total_damages = [];
 
-    db.collection("Hits").find({}).toArray(function(err, result) {
+     //Recorro cada resultado de Hit
+     for(let i in hits)
+     {
+         let player = hits[i];
+
+         //Recorro los golpes que recibio cada jugador
+         for(let j in player.Hits)
+         {
+             let player_hit = player.Hits[j];
+ 
+             //Me fijo si ya esta en la lista de damage
+             player_index = IsPlayerInDamageArray(player_hit, total_damages);
+
+             if(PlayerIsNotInDamageArray(player_index))
+             {
+                 total_damages.push(player_hit);
+             } else // Si esta le sumo el damage
+             {
+                total_damages[player_index].damage += player_hit.damage;
+             }
+         }
+
+     }   
+       
+    total_damages = OrderTotalDamageArrayByDamage(total_damages);
     
+    return total_damages;
+}
+
+function OrderTotalDamageArrayByDamage(hits)
+{
+    return hits.sort((player1, player2) => player2.damage - player1.damage);
+}
+
+function IsPlayerInDamageArray(player_hit, total_damages)
+{
+    return total_damages.findIndex(x => x.id === player_hit.id);
+}
+
+function PlayerIsNotInDamageArray(player_index)
+{
+    return player_index === -1;
+}
+
+function AddColorsToPlayerList(hits, playersData)
+{
+ 
+    for(let i in hits)
+    {
+        let hit = hits[i];
+        let player = playersData.find( x => x.name == hit.id );
+        hits[i].color = player.color;
+    }
+
+    return hits;
+
+}
+
+app.post('/api/TotalDamage', (req, res) => 
+{    
+
+    db.collection("Players").find({}).toArray(function(err, playersData) {
+
         if (err) throw err;
 
-        if(result == null) {
-            console.log("No se encontraron hits correspondientes");
-            return;
-        } 
+       
 
-        //Recorro cada resultado de Hit
-        for(let i in result)
-        {
-            let player = result[i];
-
-            //Recorro los golpes que recibio cada jugador
-            for(let j in player.Hits)
-            {
-                let player_hit = player.Hits[j];
+        db.collection("Hits").find({}).toArray(function(err, hits) {
     
-                //Me fijo si ya esta en la lista de damage
-                player_damage_index = total_damages.findIndex(x => x.id === player_hit.id);
+            if (err) throw err;
+    
+            if(hits == null) {
+                console.log("No se encontraron hits correspondientes");
+                return;
+            } 
+    
+           let total_damages = CreateTotalDamageArrayFromHits(hits);
 
-                player_hit.color = randomColor();
+           total_damages = AddColorsToPlayerList(total_damages, playersData);
 
-                //Si no esta lo agrego
-                if(player_damage_index == -1)
-                {
-                    total_damages.push(player_hit);
-                } else // Si esta le sumo el damage
-                {
-                    total_damages[player_damage_index].damage += player_hit.damage;
-                }
-            }
+           //Mandar el resultado
+           res.send(total_damages);
+        });
 
-        }   
-          
-       //Ordenar por mayor damage 
-       total_damages = total_damages.sort((player1, player2) => player2.damage - player1.damage) 
-       //Mandar el resultado
-       res.send(total_damages);
     });
+
+    
 
 })
 
