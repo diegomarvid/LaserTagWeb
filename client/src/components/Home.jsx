@@ -14,7 +14,7 @@ function Home()
 
 
         const sendPlayersNames = async () => {
-            const res = await axios.post('/api/PlayersNames', {names: playersNames});
+            const res = await axios.post('/api/Start', {names: playersNames});
         }
     
         const receiveTotalDamages = async () => {
@@ -39,7 +39,7 @@ function Home()
         };
 
         receiveTotalDamages()
-        //sendPlayersNames()
+        sendPlayersNames()
 
     
     },[])

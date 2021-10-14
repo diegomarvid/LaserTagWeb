@@ -45,34 +45,6 @@ async function main(){
   
         db = client_mongodb.db("Turret");
 
-        // const hit = {
-
-        //     id: 'a',
-        //     Hits: [
-        //       { id: 'c', damage: 5 },
-        //       { id: 'b', damage: 1 }
-        //     ]
-        //   } 
-
-        // db.collection("Hits").insertOne(hit,function(err, result) {
-        //     if (err) throw err;
-        //     console.log("Success inserting hit");
-        // });
-
-        // console.log(total_damages);
-    
-
-        // db.collection("Hits").findOne({id:'c'},function(err, result) {
-    
-        //     if (err) throw err;
-
-        //     if(result == null) {
-        //         console.log("No se encontraron hits correspondientes");
-        //         return;
-        //     } 
-        
-        // });
-        
         
     } catch (e) {
         console.error(e);
@@ -81,24 +53,16 @@ async function main(){
     }
   }
   
-async function listDatabases(client){
-    databasesList = await client.db().admin().listDatabases();
-
-    console.log("Databases:");
-    databasesList.databases.forEach(db => console.log(` - ${db.name}`));
-};
-
-
 main().catch(console.error);
 
 //************************** EXPRESS ************************************//
 
-app.post('/api/PlayersNames', (req, res) => 
+let PLAYERS_NUMBER = 2;
+
+app.post('/api/Start', (req, res) => 
 {
 
     const PlayersNames = req.body.names;
-
-    //console.log(PlayersNames);
 
     //Add colors
     for(let i in PlayersNames)
@@ -106,13 +70,25 @@ app.post('/api/PlayersNames', (req, res) =>
         PlayersNames[i].color = randomColor();
     }
 
-   // console.log(PlayersNames);
 
-    // try {
-    //     db.collection("Players").insertMany(PlayersNames);
-    //  } catch (e) {
-    //     print (e);
-    //  }
+    try {
+
+        //Clean databases
+        db.collection("Players").remove({});
+        //db.collection("Hits").remove({});
+
+        //Add players names
+        db.collection("Players").insertMany(PlayersNames);
+        
+     } catch (e) {
+        print (e);
+     }
+
+
+     PLAYERS_NUMBER = PlayersNames.length;
+
+     client.publish(StartTopic, "Pepe");
+     console.log("Starting game...");
 
 
 });
@@ -187,8 +163,6 @@ app.post('/api/TotalDamage', (req, res) =>
 
         if (err) throw err;
 
-       
-
         db.collection("Hits").find({}).toArray(function(err, hits) {
     
             if (err) throw err;
@@ -227,11 +201,12 @@ const root_topic = "LaserTag/";
 let DiedTopic = root_topic + "Died";
 let SendDamageTakenTopic = root_topic + "SendDamageTaken";
 let SendDamageTopic = root_topic + "SendDamage";
+let StartTopic = root_topic + "Start";
 
 client.subscribe(DiedTopic);
 client.subscribe(SendDamageTakenTopic);
 
-let PLAYERS_NUMBER = 2;
+
 
 let players_died = 0;
 
@@ -312,15 +287,15 @@ function HandleSendDamageTakenTopic()
 
 }
 
-const hit = {
+// const hit = {
 
-    id: 'c',
-    Hits: [
-      { id: 'a', damage: 20 },
-      { id: 'b', damage: 66 },
-      { id: 'd', damage: 11 }
-    ]
-  }
+//     id: 'c',
+//     Hits: [
+//       { id: 'a', damage: 20 },
+//       { id: 'b', damage: 66 },
+//       { id: 'd', damage: 11 }
+//     ]
+//   }
 
 //   { 
 //     "id": "c",
