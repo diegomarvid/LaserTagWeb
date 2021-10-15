@@ -158,10 +158,16 @@ function AddColorsToPlayerList(hits, playersData)
 
 app.post('/api/TotalDamage', (req, res) => 
 {    
+    console.log("Envio ranking")
 
     db.collection("Players").find({}).toArray(function(err, playersData) {
 
         if (err) throw err;
+
+        if(playersData == null){
+            console.log("No se encontraron jugadores correspondientes");
+            return;
+        } 
 
         db.collection("Hits").find({}).toArray(function(err, hits) {
     
