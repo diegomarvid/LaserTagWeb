@@ -103,35 +103,33 @@ function AddColorToPlayerList(teams, players)
 
 let PLAYERS_NUMBER = 2;
 
-app.post('/api/Start', (req, res) => 
+app.post('/api/SendPlayerNames', (req, res) => 
 {
 
-    const PlayersNames = req.body.names;
+    const PlayersNames = req.body.players;
 
-    //Add colors
-    for(let i in PlayersNames)
-    {
-        PlayersNames[i].color = randomColor();
-    }
-
+    console.log(PlayersNames)
 
     try {
+        if(PlayersNames != null)
+        {
+            //Clean databases
+            db.collection("Players").remove({});
+            //db.collection("Hits").remove({});
 
-        //Clean databases
-        db.collection("Players").remove({});
-        //db.collection("Hits").remove({});
-
-        //Add players names
-        db.collection("Players").insertMany(PlayersNames);
+            //Add players names
+            db.collection("Players").insertMany(PlayersNames);
+        }
+        
         
      } catch (e) {
-        print (e);
+        console.log(e);
      }
 
 
      PLAYERS_NUMBER = PlayersNames.length;
 
-     client.publish(StartTopic, "Pepe");
+    //  client.publish(StartTopic, "Pepe");
      console.log("Starting game...");
 
 
@@ -195,17 +193,24 @@ function AddColorsToHitsList(hits, playersData, teams)
 
         let player = playersData.find( x => x.name == hit.id );
 
-        let team = player.team;
-
-        if(team != null)
+        if(player != null)
         {
-            let color = teams.find( x => x.id == team).color;
+            let team = player.team;
 
-            hits[i].color = color;
-        } else
-        {
+            if(team != null)
+            {
+                let color = teams.find( x => x.id == team).color;
+    
+                hits[i].color = color;
+            } else
+            {
+                hits[i].color = "#8d8d8d";
+            }
+        } else{
             hits[i].color = "#8d8d8d";
         }
+
+        
 
     }
 
@@ -266,7 +271,7 @@ const url = 'mqtt://broker.hivemq.com';
 var client = mqtt.connect(url)
 
 client.on("connect", function(){	
-    console.log("connected:  " + client.connected);
+    console.log("Connected to MQTT:  " + client.connected);
 })
 
 const root_topic = "LaserTag/";
@@ -275,9 +280,11 @@ let DiedTopic = root_topic + "Died";
 let SendDamageTakenTopic = root_topic + "SendDamageTaken";
 let SendDamageTopic = root_topic + "SendDamage";
 let StartTopic = root_topic + "Start";
+let TeamTopic = root_topic + "Team";
 
 client.subscribe(DiedTopic);
 client.subscribe(SendDamageTakenTopic);
+client.subscribe(TeamTopic);
 
 
 
@@ -300,6 +307,11 @@ client.on('message', function(topic, message, packet){
     if(topic == SendDamageTakenTopic)
     {
         HandleSendDamageTakenTopic();
+    }
+
+    if(topic == TeamTopic)
+    {
+        HandleTeamTopic();
     }
 
 });
@@ -327,11 +339,24 @@ function ChangePayloadIDToNames(payload, playersNames)
 {
     let newPayload = payload;
 
-    newPayload.id = GetNameById(payload.id, playersNames);
+    let name = GetNameById(payload.id, playersNames);
 
+    if(name != null){
+        newPayload.id = name;
+    }else{
+        newPayload.id = "Desconocido";
+    }
+    
     for(let i in payload.Hits)
     {
-        newPayload.Hits[i].id = GetNameById(payload.Hits[i].id, playersNames);
+        let name = GetNameById(payload.Hits[i].id, playersNames);
+
+        if(name != null){
+            newPayload.Hits[i].id  = name;
+        }else{
+            newPayload.Hits[i].id = "Desconocido";
+        }
+
     }
 
     return newPayload;
@@ -356,6 +381,31 @@ function HandleSendDamageTakenTopic()
 
 
     })
+
+
+}
+
+function HandleTeamTopic()
+{
+    console.log("Jugador conectado, escribiendo equipo...");
+
+    let id = payload.id;
+    let team = payload.team;
+
+    let query = {id: id};
+
+    db.collection("Players").update(query, {$set: {team: team}}, function (err, result){
+        
+        if (err) throw err;
+
+        const modified = result.modifiedCount;
+
+        if(modified == 0)
+        {
+            console.log(`No se encontro la pistola asociada al id: ${id}`)
+        }
+        
+    });
 
 
 }

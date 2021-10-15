@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -15,6 +15,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+import axios from 'axios';
+
 
 const useStyles = makeStyles({
     fullHeightButton: {
@@ -27,6 +29,7 @@ const useStyles = makeStyles({
       },
   });
 
+ 
 
 
 export default function InteractiveList() {
@@ -41,12 +44,30 @@ export default function InteractiveList() {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
 
+    useEffect( () => {
+
+        const receivePlayers = async () => {
+ 
+            const result = await axios.post('/api/ReceivePlayers', {});
+            const players = result.data;
+            setData(players);
+        }
+
+        receivePlayers();
+    
+    },[])
+
     function addPlayer()
     {
         let newPlayer = {id: id, name: name};
         setData([...data, newPlayer])
         setId('');
         setName('');
+    }
+
+    const SendPlayersNames = () => {
+        console.log("Envio los nombres: " , data)
+        axios.post('/api/SendPlayerNames', {players: data});
     }
 
   return (
@@ -177,7 +198,7 @@ export default function InteractiveList() {
                         size = "large"
                         color = "success"
                         classes={{root: classes.fullHeightButton}}
-                        //onClick = {}
+                        onClick = {SendPlayersNames}
                         >
                             Enviar
                     </Button>
