@@ -318,16 +318,52 @@ client.on('message', function(topic, message, packet){
 
 function HandleDieTopic()
 {
-    players_died++;
 
-    console.log(`Jugador muerto [${players_died}/${PLAYERS_NUMBER} jugadores]`);
+    let id = payload.id;
 
-    if(players_died == PLAYERS_NUMBER - 1)
-    {
-        console.log("Avisando a los usuarios que manden su damage");
-        client.publish(SendDamageTopic, "");
-        players_died = 0;
-    }
+    db.collection("Players").findOne({id: id}, function(err, player){
+
+        if(err) throw err;
+
+        let team = player.team;
+
+        db.collection("Teams").findOneAndUpdate(
+            { id: team},
+            { $inc: { cantidadJugadores: -1 } }, 
+            function (err, result){
+
+
+                console.log("Murio " + player.name);
+
+                db.collection("Teams").find({}).toArray(function(err, teams){
+                    
+
+                    let aliveTeams = teams.filter( x => x.cantidadJugadores > 0);
+                    
+                    if(aliveTeams.length == 1)
+                    {
+                        console.log("Termino el juego");
+                        console.log("Gano el equipo " + aliveTeams[0].id);
+                    }
+
+                })
+            }
+        )
+
+
+
+    });
+
+    // players_died++;
+
+    // console.log(`Jugador muerto [${players_died}/${PLAYERS_NUMBER} jugadores]`);
+
+    // if(players_died == PLAYERS_NUMBER - 1)
+    // {
+    //     console.log("Avisando a los usuarios que manden su damage");
+    //     client.publish(SendDamageTopic, "");
+    //     players_died = 0;
+    // }
 }
 
 function GetNameById(id, playersNames)
@@ -394,39 +430,43 @@ function HandleTeamTopic()
 
     let query = {id: id};
 
-    db.collection("Players").findOne({id: id}, function(err, result){
+    //Busco jugador con el id
+    db.collection("Players").findOne({id: id}, function(err, player){
         if (err) throw err;
 
-        if(result == null){
+        if(player == null){
             console.log("No se asocio el jugador a la pistola con id: " + id);
         } else{
 
-            let playerTeam = result.team;
+            //Obtengo equipo original del jugador con el id
+            let playerTeam = player.team;
 
-            console.log("El equipo del jugador es: " + playerTeam)
-            console.log("El nuevo equipo va a ser: " + team);
+            console.log(`Equipo viejo: [${playerTeam}] | Equipo nuevo: [${team}]`)
 
-            db.collection("Players").update(query, {$set: {team: team}}, function (err, result){
+            //Cambio el equipo del jugador deseado
+            db.collection("Players").updateOne(query, {$set: {team: team}}, function (err, result){
         
                 if (err) throw err;
+
+                console.log(`Player ${player.name} [${id}] paso a equipo ${team}`)
         
+                //Incremento en 1 la cantidad de jugadores del nuevo equipo
                 db.collection("Teams").findOneAndUpdate(
                     { id: team},
                     { $inc: { cantidadJugadores: 1 } },  
 
                     function(err, result){
 
-                        // console.log("resultado de cambiar equipo y sumar: ", result)
+                        console.log(`Incrementando cantidad jugadores por 1 en ${team}`)   
+                        console.log(result)
 
-                        //Ya estaba en un equipo, se esta cambiando
+                        //Si ya tenia equipo decremento en 1 la cantidad de jugadores del equipo viejo
                         if(playerTeam != null)
-                        {
-                            
-                            
+                        {       
                             db.collection("Teams").findOneAndUpdate(
                                 { id: playerTeam},
                                 { $inc: { cantidadJugadores: -1 } }, function (err, result){
-                                    // console.log("resultado de decrementar a mi equipo: ", result)
+                                    console.log(`Decrementando cantidad de jugadores por 1 en ${playerTeam}`)    
                                 }
                             )
                         }
