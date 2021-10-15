@@ -30,7 +30,17 @@ function Home()
 
     return (
         <div>
-            <h1>Home</h1>
+          <Grid container>
+            <Grid item xs = {12} md = {4}>
+            </Grid>
+
+            <Grid item xs = {12} md = {5}>
+                <h1>Bienvenido a Laser Tag vs Kid Killer Machine</h1>
+            </Grid>
+
+            <Grid item xs = {12} md = {2}>
+            </Grid>
+          </Grid>
         </div>
     )
 
