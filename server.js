@@ -394,18 +394,50 @@ function HandleTeamTopic()
 
     let query = {id: id};
 
-    db.collection("Players").update(query, {$set: {team: team}}, function (err, result){
-        
+    db.collection("Players").findOne({id: id}, function(err, result){
         if (err) throw err;
 
-        const modified = result.modifiedCount;
+        if(result == null){
+            console.log("No se asocio el jugador a la pistola con id: " + id);
+        } else{
 
-        if(modified == 0)
-        {
-            console.log(`No se encontro la pistola asociada al id: ${id}`)
-        }
+            let playerTeam = result.team;
+
+            console.log("El equipo del jugador es: " + playerTeam)
+            console.log("El nuevo equipo va a ser: " + team);
+
+            db.collection("Players").update(query, {$set: {team: team}}, function (err, result){
         
-    });
+                if (err) throw err;
+        
+                db.collection("Teams").findOneAndUpdate(
+                    { id: team},
+                    { $inc: { cantidadJugadores: 1 } },  
+
+                    function(err, result){
+
+                        // console.log("resultado de cambiar equipo y sumar: ", result)
+
+                        //Ya estaba en un equipo, se esta cambiando
+                        if(playerTeam != null)
+                        {
+                            
+                            
+                            db.collection("Teams").findOneAndUpdate(
+                                { id: playerTeam},
+                                { $inc: { cantidadJugadores: -1 } }, function (err, result){
+                                    // console.log("resultado de decrementar a mi equipo: ", result)
+                                }
+                            )
+                        }
+
+                    }
+                )
+            });
+
+        }
+    })
+
 
 
 }
