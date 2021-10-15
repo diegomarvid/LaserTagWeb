@@ -175,10 +175,11 @@ export default function InteractiveList() {
                         variant="contained" 
                         endIcon={<SendIcon />}
                         size = "large"
+                        color = "success"
                         classes={{root: classes.fullHeightButton}}
                         //onClick = {}
                         >
-                            Send
+                            Enviar
                     </Button>
                 </Box>
             </Grid>

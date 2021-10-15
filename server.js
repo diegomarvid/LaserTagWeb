@@ -57,6 +57,50 @@ main().catch(console.error);
 
 //************************** EXPRESS ************************************//
 
+
+app.post('/api/ReceivePlayers', (req, res) => 
+{
+
+    console.log("Voy a enviar los jugadores...")
+
+   db.collection("Teams").find({}).toArray(function(err, teams)
+   {
+        if (err) throw err;
+
+
+        db.collection("Players").find({}).toArray(function(err, result)
+        {
+            if (err) throw err;
+    
+            let players = result;
+
+            players = AddColorToPlayerList(teams,players);
+    
+            res.send(players)
+        })
+   })
+
+});
+
+function AddColorToPlayerList(teams, players)
+{
+    for(let i in players)
+    {
+        let player = players[i];
+
+        let myTeam = teams.find( team => team.id == player.team );
+
+        if(myTeam != null)
+        {
+            players[i].color = myTeam.color;   
+        } else{
+            players[i].color = "#8d8d8d";   
+        }
+    }
+
+    return players;
+}
+
 let PLAYERS_NUMBER = 2;
 
 app.post('/api/Start', (req, res) => 
@@ -142,14 +186,27 @@ function PlayerIsNotInDamageArray(player_index)
     return player_index === -1;
 }
 
-function AddColorsToPlayerList(hits, playersData)
+function AddColorsToHitsList(hits, playersData, teams)
 {
  
     for(let i in hits)
     {
         let hit = hits[i];
+
         let player = playersData.find( x => x.name == hit.id );
-        hits[i].color = player.color;
+
+        let team = player.team;
+
+        if(team != null)
+        {
+            let color = teams.find( x => x.id == team).color;
+
+            hits[i].color = color;
+        } else
+        {
+            hits[i].color = "#8d8d8d";
+        }
+
     }
 
     return hits;
@@ -160,35 +217,45 @@ app.post('/api/TotalDamage', (req, res) =>
 {    
     console.log("Envio ranking")
 
-    db.collection("Players").find({}).toArray(function(err, playersData) {
+    db.collection("Teams").find({}).toArray(function(err, teams) {
 
         if (err) throw err;
 
-        if(playersData == null){
-            console.log("No se encontraron jugadores correspondientes");
+        if(teams == null){
+            console.log("No se encontraron equipos correspondientes");
             return;
         } 
 
-        db.collection("Hits").find({}).toArray(function(err, hits) {
-    
+        db.collection("Players").find({}).toArray(function(err, playersData) {
+
             if (err) throw err;
     
-            if(hits == null) {
-                console.log("No se encontraron hits correspondientes");
+            if(playersData == null){
+                console.log("No se encontraron jugadores correspondientes");
                 return;
             } 
     
-           let total_damages = CreateTotalDamageArrayFromHits(hits);
-
-           total_damages = AddColorsToPlayerList(total_damages, playersData);
-
-           //Mandar el resultado
-           res.send(total_damages);
+            db.collection("Hits").find({}).toArray(function(err, hits) {
+        
+                if (err) throw err;
+        
+                if(hits == null) {
+                    console.log("No se encontraron hits correspondientes");
+                    return;
+                } 
+        
+               let total_damages = CreateTotalDamageArrayFromHits(hits);
+    
+               total_damages = AddColorsToHitsList(total_damages, playersData, teams);
+    
+               //Mandar el resultado
+               res.send(total_damages);
+            });
+    
         });
 
-    });
+    })
 
-    
 
 })
 

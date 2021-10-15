@@ -1,12 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
-import AddIcon from '@mui/icons-material/AddCircle';
+import TeamIcon from '@mui/icons-material/Group';
+import NoTeamIcon from '@mui/icons-material/HighlightOff';
 
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -14,12 +16,16 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
+import NotConnectedIcon from '@mui/icons-material/SignalWifiBad';
+import ConnectedIcon from '@mui/icons-material/Wifi';
+
+import axios from 'axios';
 
 
 const useStyles = makeStyles({
     fullHeightButton: {
       height: "100%",
-      width: "50%"
+      width: "50%",
     },
     largeIcon: {
         width: 60,
@@ -27,15 +33,42 @@ const useStyles = makeStyles({
       },
   });
 
+function TeamPlayerIcon(props)
+{
+    if(props.player.team == null)
+    {
+        return <NoTeamIcon sx={{ color: '#8d8d8d'}}/>;
+    } else{
+        return  <TeamIcon sx={{ color: props.player.color }}/>;
+    }
+}
+
 
 
 export default function ConexionList() {
 
     const classes = useStyles();
 
+    
+    useEffect( () => {
+
+        const receivePlayers = async () => {
+ 
+            const result = await axios.post('/api/ReceivePlayers', {});
+            const players = result.data;
+            setData(players);
+        }
+
+        receivePlayers();
+    
+    },[])
+    
+
     const [data, setData] = useState([
-        {id: 'c', name: 'Diego'},
-        {id: 'a', name: "Otte"}
+        {id: 'c', name: 'Diego', team: 'r', color: '#990000'},
+        {id: 'a', name: "Otte"},
+        {id: 'b', name: "Claudio", team: 'r', color: '#990000'},
+        {id: 'd', name: "Torreta", team: 'b', color: '#0000cc'}
     ])
 
     const [id, setId] = useState('');
@@ -58,7 +91,7 @@ export default function ConexionList() {
 
             <Grid item xs={4} md={4} align = "center">
                 <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-                    Nombres de los jugadores
+                    Jugadores conectados
                 </Typography>
             </Grid>
         </Grid>
@@ -74,27 +107,24 @@ export default function ConexionList() {
                 {data.map( (player) => (
 
                     <ListItem
+                        key = {player.id}
                         secondaryAction={
                         <IconButton 
                         edge="end" 
                         aria-label="delete"
-                        onClick = {() => {
-                            let newData = data.filter(function(x) { return x.id != player.id; }); 
-                            setData(newData)
-                        }}
                         >
-                            <DeleteIcon />
+                            {player.team == null ? <NotConnectedIcon/>: <ConnectedIcon/>}
                         </IconButton>
                         }
                     >
                         
-                        <ListItemText
-                        primary={player.id}
-                        /> 
+                        
+                        <ListItemIcon> 
+                            <TeamPlayerIcon player={player}/>
+                        </ListItemIcon> 
 
                         <ListItemText
                         primary={player.name}
-                        fontSize = "15"
                         />
 
                     </ListItem>
@@ -109,59 +139,6 @@ export default function ConexionList() {
         </Grid>
    
                         
-        <Grid id="row" container>
-            <Grid item xs={4} md={4} ></Grid>
-            <Grid item xs={4} md={4} align = "center">
-
-                <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-                    Agregar jugador
-                </Typography>
-
-            </Grid>
-        </Grid>
-
-        <Grid id="row" container>
-
-            <Grid item xs={4} md={4} ></Grid>
-
-            <Grid item xs={2} md={2} align = "center">
-
-                <TextField 
-                id="idText" 
-                label="Id" 
-                variant="outlined" 
-                value={id}
-                onInput={ e => setId(e.target.value)}
-                />
-
-            </Grid>
-
-            <Grid item xs={2} md={2}>
-
-                <TextField 
-                id="nombreText" 
-                label="Nombre" 
-                variant="outlined" 
-                value={name} 
-                onInput={ e => setName(e.target.value)}
-                />
-
-            </Grid> 
-
-            <Grid item xs={2} md={2}>
-                <IconButton
-                iconStyle ={classes.largeIcon}
-                onClick = {addPlayer}
-                >
-                    <AddIcon
-                    fontSize="large"
-                    color = "secondary"
-                     />
-                </IconButton>
-            
-            </Grid> 
-
-        </Grid>
 
         <Grid id="row" container>
 
@@ -176,9 +153,10 @@ export default function ConexionList() {
                         endIcon={<SendIcon />}
                         size = "large"
                         classes={{root: classes.fullHeightButton}}
+                        color="success"
                         //onClick = {}
                         >
-                            Send
+                            Start
                     </Button>
                 </Box>
             </Grid>
