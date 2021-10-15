@@ -29,7 +29,7 @@ const useStyles = makeStyles({
 
 
 
-export default function InteractiveList() {
+export default function ConexionList() {
 
     const classes = useStyles();
 

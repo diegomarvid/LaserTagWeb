@@ -5,6 +5,7 @@ import Home from './components/Home';
 import Nav from './components/Nav';
 import RankingScreen from './screens/RankingScreen';
 import ConfigScreen from './screens/ConfigScreen';
+import ConexionScreen from './screens/ConexionScreen';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import IconButton from '@mui/material/IconButton';
@@ -55,7 +56,12 @@ function App() {
 
       <Switch>
 
-      <Route path="/config">
+      <Route path="/connections">
+            <Nav/>
+            <ConexionScreen/>
+        </Route>
+
+        <Route path="/config">
             <Nav/>
             <ConfigScreen/>
         </Route>

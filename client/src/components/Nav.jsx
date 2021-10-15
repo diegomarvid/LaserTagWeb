@@ -19,7 +19,8 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import RankingIcon from '@mui/icons-material/EqualizerSharp';
 import HomeIcon from '@mui/icons-material/Home';
-import ConfigIcon from '@mui/icons-material/Settings';
+import NamesIcon from '@mui/icons-material/Group';
+import ConnectionIcon from '@mui/icons-material/Wifi';
 
 import { useHistory } from 'react-router-dom';
 
@@ -96,6 +97,10 @@ export default function PersistentDrawerLeft() {
     history.push("/config")
   }
 
+  const handleConnectionsClick = () => {
+    history.push("/connections")
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -111,7 +116,7 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Persistent drawer
+            LaserTag Turret
           </Typography>
         </Toolbar>
       </AppBar>
@@ -155,14 +160,24 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary="Ranking" />
             </ListItem>
 
-            <ListItem button key="config"
+            <ListItem button key="names"
             onClick = {handleConfigClick}
             >
                 <ListItemIcon>
-                    <ConfigIcon />
+                    <NamesIcon />
                 </ListItemIcon>
 
-                <ListItemText primary="Configuracion" />
+                <ListItemText primary="Nombres" />
+            </ListItem>
+
+            <ListItem button key="coneccionex"
+            onClick = {handleConnectionsClick}
+            >
+                <ListItemIcon>
+                    <ConnectionIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Conexiones" />
             </ListItem>
 
         </List>
