@@ -43,6 +43,12 @@ function TeamPlayerIcon(props)
     }
 }
 
+function StartGame()
+{
+    axios.post("/api/Start");
+    console.log("Starting game...")
+  
+}
 
 
 export default function ConexionList() {
@@ -155,7 +161,7 @@ export default function ConexionList() {
                         size = "large"
                         classes={{root: classes.fullHeightButton}}
                         color="success"
-                        //onClick = {}
+                        onClick = {StartGame}
                         >
                             Start
                     </Button>

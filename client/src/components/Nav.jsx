@@ -21,6 +21,7 @@ import RankingIcon from '@mui/icons-material/EqualizerSharp';
 import HomeIcon from '@mui/icons-material/Home';
 import NamesIcon from '@mui/icons-material/Group';
 import ConnectionIcon from '@mui/icons-material/Wifi';
+import LiveIcon from '@mui/icons-material/LiveTv';
 
 import { useHistory } from 'react-router-dom';
 
@@ -101,6 +102,10 @@ export default function PersistentDrawerLeft() {
     history.push("/connections")
   }
 
+  const handleLiveClick = () => {
+    history.push("/live")
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -150,6 +155,16 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary="Home" />
             </ListItem>
 
+            <ListItem button key="live"
+            onClick = {handleLiveClick}
+            >
+                <ListItemIcon>
+                    <LiveIcon />
+                </ListItemIcon>
+
+                <ListItemText primary="Live" />
+            </ListItem>
+
             <ListItem button key="ranking"
             onClick = {handleRankingClick}
             >
@@ -170,7 +185,7 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary="Nombres" />
             </ListItem>
 
-            <ListItem button key="coneccionex"
+            <ListItem button key="conecciones"
             onClick = {handleConnectionsClick}
             >
                 <ListItemIcon>

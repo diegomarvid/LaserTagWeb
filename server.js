@@ -2,13 +2,15 @@ const express = require('express');
 var mqtt = require('mqtt');
 const cors = require('cors');
 const path = require('path');
-var randomColor = require('randomcolor');
+
 
 const MongoClient = require('mongodb').MongoClient;
 
 const PORT = process.env.PORT || 8080;
 
 const app = express();
+
+let server = require('http').Server(app);
 
 app.use(express.json())
 app.use(cors());
@@ -24,7 +26,35 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/public/index.html'));
 });
     
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+// app.listen(PORT, console.log(`Server started on port ${PORT}`));
+server.listen(PORT, function() {
+    console.log("Server listening at " + PORT);
+});
+
+let io = require('socket.io')(server, {});
+
+// ************************** SOCKET IO *****************************//
+
+io.sockets.on('connection', function(socket) {
+
+    socket.on('disconnect', function() {
+        console.log('socket disconnection')
+    });
+
+});
+
+let LivePlayersData = [];
+
+setInterval(function() {
+
+    if(GAME_STARTED)
+    {
+        io.sockets.emit('live', LivePlayersData);
+    }
+    
+      
+
+}, 1000)
 
 // ************************* MONGO DB ******************************** //
 
@@ -61,9 +91,34 @@ let GAME_STARTED = false;
 
 app.post('/api/Start', (req, res) => 
 {
+    console.log("Game has started...")
 
-    client.publish(StartTopic, "");
-    GAME_STARTED = true;
+    db.collection("Teams").find({}).toArray(function(err, teams)
+    {
+
+
+        db.collection("Players").find({}).toArray(function(err, players)
+        {
+            
+            for(let i in players)
+            {
+                let player = players[i];
+                LivePlayersData.push({id: player.name, team: player.team, alive:true});
+            }
+
+            LivePlayersData = AddColorToPlayerList(teams, LivePlayersData);
+
+            LivePlayersData = LivePlayersData.sort((player1, player2) => player2.team.localeCompare(player1.team))
+
+            console.log(LivePlayersData)
+
+            client.publish(StartTopic, "");
+            GAME_STARTED = true;
+        
+        });
+
+    });
+
 
 });
 
@@ -111,8 +166,6 @@ function AddColorToPlayerList(teams, players)
     return players;
 }
 
-let PLAYERS_NUMBER = 2;
-
 app.post('/api/SendPlayerNames', (req, res) => 
 {
     if(GAME_STARTED) return;
@@ -136,13 +189,6 @@ app.post('/api/SendPlayerNames', (req, res) =>
      } catch (e) {
         console.log(e);
      }
-
-
-     PLAYERS_NUMBER = PlayersNames.length;
-
-    //  client.publish(StartTopic, "Pepe");
-    //  console.log("Starting game...");
-
 
 });
 
@@ -276,14 +322,25 @@ function CreateTeamsTotalDamageArrayFromPlayersTotalDamage(total_damage_by_playe
     {
         let player = total_damage_by_players[i];
 
-        let player_team = players.find( x => x.name == player.id).team;
+        let player_info = players.find( x => x.name == player.id)
 
-        let my_team_index = total_damage_by_teams.findIndex( x => x.id == player_team);
-
-        if(my_team_index != -1)
+        if(player_info != null)
         {
-            total_damage_by_teams[my_team_index].damage += player.damage;
+            let player_team = player_info.team;
+    
+            if(player_team != null){
+            
+                let my_team_index = total_damage_by_teams.findIndex( x => x.id == player_team);
+
+                if(my_team_index != -1)
+                {
+                    total_damage_by_teams[my_team_index].damage += player.damage;
+                }
+
+            }
+
         }
+    
 
     }
 
@@ -355,16 +412,20 @@ app.post('/api/DamageMadeByPlayer', (req, res) =>
     
                         if(hit.id == playerName)
                         {
-                            let enemy_player_index = total_damage_by_player.findIndex(x => x.id == enemyName);                        
-                            total_damage_by_player[enemy_player_index].damage += hit.damage;
+                            let enemy_player_index = total_damage_by_player.findIndex(x => x.id == enemyName);
+                            if(enemy_player_index != -1){                        
+                                total_damage_by_player[enemy_player_index].damage += hit.damage;
+                            }
                         }
 
                         //Los damage que me hicieron
                         if(enemyName == playerName)
                         {
                             console.log("Agrego danos a claudios")
-                            let enemy_player_index = total_damage_received.findIndex(x => x.id == hit.id);                        
-                            total_damage_received[enemy_player_index].damage += hit.damage;
+                            let enemy_player_index = total_damage_received.findIndex(x => x.id == hit.id);      
+                            if(enemy_player_index != -1){            
+                                total_damage_received[enemy_player_index].damage += hit.damage;
+                            }
                         }
     
     
@@ -522,6 +583,10 @@ function HandleDieTopic()
 
 
                 console.log("Murio " + player.name);
+
+                //Setear persona muerta en live array
+                let deadPersonIndex = LivePlayersData.findIndex((x) => x.id == player.name);
+                LivePlayersData[deadPersonIndex].alive = false;
 
                 db.collection("Teams").find({}).toArray(function(err, teams){
                     

@@ -6,13 +6,11 @@ import Nav from './components/Nav';
 import RankingScreen from './screens/RankingScreen';
 import ConfigScreen from './screens/ConfigScreen';
 import ConexionScreen from './screens/ConexionScreen';
+import LiveScreen from './screens/LiveScreen';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import IconButton from '@mui/material/IconButton';
-import Box from '@mui/material/Box';
+
 import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 import { deepOrange, grey } from '@mui/material/colors';
 
@@ -56,7 +54,12 @@ function App() {
 
       <Switch>
 
-      <Route path="/connections">
+        <Route path="/live">
+            <Nav/>
+            <LiveScreen/>
+        </Route>
+
+        <Route path="/connections">
             <Nav/>
             <ConexionScreen/>
         </Route>

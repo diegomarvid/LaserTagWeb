@@ -147,7 +147,10 @@ function RankingScreen()
                     <Grid container id="row">
                         <Grid item xs={12} md={12} align="center" >
                             <Typography sx={{ mt: 4, mb: 2 }} variant="h5" component="div">
-                                Seleccionar estadisticas personalizadas
+                                    Estadisticas Personalizadas
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Seleccionar Jugador
                             </Typography>
                         </Grid>
                     </Grid>
