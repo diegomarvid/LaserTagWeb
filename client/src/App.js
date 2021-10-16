@@ -27,7 +27,7 @@ function App() {
     palette: {
       mode: 'dark',
       primary: deepOrange,
-          divider: "#1F1B24"[700],
+          divider: "#141414",
           background: {
             default: "#1F1B24",
             paper: "#1F1B24",
