@@ -57,6 +57,16 @@ main().catch(console.error);
 
 //************************** EXPRESS ************************************//
 
+let GAME_STARTED = false;
+
+app.post('/api/Start', (req, res) => 
+{
+
+    client.publish(StartTopic, "");
+    GAME_STARTED = true;
+
+});
+
 
 app.post('/api/ReceivePlayers', (req, res) => 
 {
@@ -105,6 +115,7 @@ let PLAYERS_NUMBER = 2;
 
 app.post('/api/SendPlayerNames', (req, res) => 
 {
+    if(GAME_STARTED) return;
 
     const PlayersNames = req.body.players;
 
@@ -130,7 +141,7 @@ app.post('/api/SendPlayerNames', (req, res) =>
      PLAYERS_NUMBER = PlayersNames.length;
 
     //  client.publish(StartTopic, "Pepe");
-     console.log("Starting game...");
+    //  console.log("Starting game...");
 
 
 });
@@ -301,17 +312,28 @@ client.on('message', function(topic, message, packet){
 
     if(topic == DiedTopic)
     {
-       HandleDieTopic();    
+        if(GAME_STARTED)
+        {
+            HandleDieTopic();  
+        }
+         
     }
 
     if(topic == SendDamageTakenTopic)
     {
-        HandleSendDamageTakenTopic();
+        if(!GAME_STARTED){
+            HandleSendDamageTakenTopic();
+        }
+        
     }
 
     if(topic == TeamTopic)
     {
-        HandleTeamTopic();
+        if(!GAME_STARTED)
+        {
+            HandleTeamTopic();
+        }
+       
     }
 
 });
@@ -344,6 +366,8 @@ function HandleDieTopic()
                     {
                         console.log("Termino el juego");
                         console.log("Gano el equipo " + aliveTeams[0].id);
+                        GAME_STARTED = false;
+                        client.publish(SendDamageTopic, "");
                     }
 
                 })
