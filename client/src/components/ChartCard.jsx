@@ -7,7 +7,7 @@ import {Chart} from './BarChart'
 export const ChartCard = (props) => {
   return (
 
-    <Card>
+    <Card styles = {{height:"100%"}}>
 
         <CardContent>
 

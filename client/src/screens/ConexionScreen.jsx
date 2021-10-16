@@ -87,9 +87,10 @@ export default function ConexionList() {
     <Grid container spacing={2}>
 
         <Grid id="row" container>
-            <Grid item xs={4} md={4} ></Grid>
 
-            <Grid item xs={4} md={4} align = "center">
+            <Grid item xs={0} md={4} ></Grid>
+
+            <Grid item xs={12} md={4} align = "center">
                 <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
                     Jugadores conectados
                 </Typography>
@@ -98,9 +99,9 @@ export default function ConexionList() {
 
         <Grid id="row" container>
 
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={1} md={4} ></Grid>
             
-            <Grid item xs={4} md={4}>
+            <Grid item xs={10} md={4}>
 
                 <List>
 
@@ -142,9 +143,9 @@ export default function ConexionList() {
 
         <Grid id="row" container>
 
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={3} md={4} ></Grid>
 
-            <Grid item xs={2} md={4}
+            <Grid item xs={6} md={4}
             align="center"
             >
                 <Box pt={6}>

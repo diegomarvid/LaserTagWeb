@@ -75,10 +75,10 @@ export default function InteractiveList() {
     <Grid container spacing={2}>
 
         <Grid id="row" container>
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={0} md={4} ></Grid>
 
-            <Grid item xs={4} md={4} align = "center">
-                <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+            <Grid item xs={12} md={4} align = "center">
+                <Typography sx={{ mt: 4, mb: 2 }} variant="h5" component="div">
                     Nombres de los jugadores
                 </Typography>
             </Grid>
@@ -86,9 +86,9 @@ export default function InteractiveList() {
 
         <Grid id="row" container>
 
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={1} md={4} ></Grid>
             
-            <Grid item xs={4} md={4}>
+            <Grid item xs={10} md={4}>
 
                 <List>
 
@@ -110,7 +110,7 @@ export default function InteractiveList() {
                     >
                         
                         <ListItemText
-                        primary={player.id}
+                        primary={ <Typography variant="h5" style={{ color: '#ffffff65' }}>{player.id}</Typography>}
                         /> 
 
                         <ListItemText
@@ -131,21 +131,21 @@ export default function InteractiveList() {
    
                         
         <Grid id="row" container>
-            <Grid item xs={4} md={4} ></Grid>
-            <Grid item xs={4} md={4} align = "center">
+            <Grid item xs={0} md={4} ></Grid>
+            <Grid item xs={12} md={4} align = "center">
 
-                <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+                <Typography sx={{ mt: 4, mb: 2 }} variant="h5" component="div">
                     Agregar jugador
                 </Typography>
 
             </Grid>
         </Grid>
 
-        <Grid id="row" container>
+        <Grid id="row" container spacing = {1}>
 
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={3} md={4} ></Grid>
 
-            <Grid item xs={2} md={2} align = "center">
+            <Grid item xs={3} md={2} align = "center">
 
                 <TextField 
                 id="idText" 
@@ -157,7 +157,7 @@ export default function InteractiveList() {
 
             </Grid>
 
-            <Grid item xs={2} md={2}>
+            <Grid item xs={3} md={2}>
 
                 <TextField 
                 id="nombreText" 
@@ -186,9 +186,9 @@ export default function InteractiveList() {
 
         <Grid id="row" container>
 
-            <Grid item xs={4} md={4} ></Grid>
+            <Grid item xs={3} md={4} ></Grid>
 
-            <Grid item xs={2} md={4}
+            <Grid item xs={6} md={4}
             align="center"
             >
                 <Box pt={6}>

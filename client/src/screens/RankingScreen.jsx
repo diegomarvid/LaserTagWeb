@@ -72,9 +72,53 @@ function RankingScreen()
 
             <Grid container id="row">
 
-                <Grid item xs = {6} md = {4}>
+            {/* <Grid item xs = {6} md = {2}> </Grid> */}
+               
+
+                <Grid item xs = {12} md = {6} align = "center">
                     
-                <Box m={2} pt = {2}>
+                    <Box m={2}>
+
+                        <ChartCard 
+                        title = "Ranking de Damage"
+                        subtitle = "Por Equipos"
+                        chartData = {chartData}
+                        />
+
+                    </Box>
+                </Grid>
+
+                <Grid item xs = {12} md = {6} >
+                    
+                    <Box m={2}>
+
+                        <ChartCard 
+                        title = "Ranking de Damage"
+                        subtitle = "Por Equipos"
+                        chartData = {chartData}
+                        />
+
+                    </Box>
+
+                    {/* <Box m={2}>
+
+                        <ChartCard 
+                        title = "Ranking de Damage"
+                        subtitle = "Por Equipos"
+                        chartData = {chartData}
+                        />
+
+                    </Box> */}
+                </Grid>
+
+                
+            </Grid>
+
+            <Grid container id="row">
+
+                <Grid item xs = {12} md = {4}>
+                    
+                <Box m={2}>
 
                     <ChartCard 
                     title = "Ranking de Damage"
@@ -86,9 +130,9 @@ function RankingScreen()
            
                 </Grid>
 
-                <Grid item xs = {6} md = {4}>
+                <Grid item xs = {12} md = {4}>
                     
-                <Box m={2} pt = {2}>
+                <Box m={2}>
 
                     
                     <ChartCard 
@@ -100,9 +144,9 @@ function RankingScreen()
                 </Box>
                 </Grid>
 
-                <Grid item xs = {6} md = {4}>
+                <Grid item xs = {12} md = {4}>
                     
-                    <Box m={2} pt = {2}>
+                    <Box m={2}>
                         
                         <ChartCard 
                         title = "Ranking de Kills"
