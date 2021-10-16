@@ -82,12 +82,6 @@ function App() {
 
     </ThemeProvider>
   
-    // <>
-
-    // {/* <Home></Home> */}
-    // <RankingScreen/>
-  
-    // </>
   )
  
   

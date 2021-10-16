@@ -146,7 +146,29 @@ app.post('/api/SendPlayerNames', (req, res) =>
 
 });
 
-function CreateTotalDamageArrayFromHits(hits)
+app.post('/api/GetPlayerNames', (req, res) => 
+{
+
+    db.collection("Players").find({}).toArray(function(err, players) {
+
+        if(err) throw err;
+
+        let playersNames = [];
+
+        for(let i in players)
+        {
+            let player = players[i];
+            playersNames.push(player.name);
+        }
+
+        res.send(playersNames);
+        console.log(playersNames)
+    });
+    
+
+});
+
+function CreateTotalDamageArrayFromHits(hits , playersData, teams)
 {
 
     let total_damages = [];
@@ -176,6 +198,8 @@ function CreateTotalDamageArrayFromHits(hits)
      }   
        
     total_damages = OrderTotalDamageArrayByDamage(total_damages);
+
+    total_damages = AddColorsToHitsList(total_damages, playersData, teams);
     
     return total_damages;
 }
@@ -229,6 +253,144 @@ function AddColorsToHitsList(hits, playersData, teams)
 
 }
 
+function CreateEmptyTeamDamageArray(teams){
+    
+    let total_damage_by_teams = [];
+
+    for(let i in teams)
+    {
+        let team = teams[i]
+
+        total_damage_by_teams.push({id: team.id, color: team.color, damage: 0});
+    }
+
+    return total_damage_by_teams;
+
+}
+
+function CreateTeamsTotalDamageArrayFromPlayersTotalDamage(total_damage_by_players, players, teams)
+{
+    let total_damage_by_teams = CreateEmptyTeamDamageArray(teams);
+
+    for(let i in total_damage_by_players)
+    {
+        let player = total_damage_by_players[i];
+
+        let player_team = players.find( x => x.name == player.id).team;
+
+        let my_team_index = total_damage_by_teams.findIndex( x => x.id == player_team);
+
+        if(my_team_index != -1)
+        {
+            total_damage_by_teams[my_team_index].damage += player.damage;
+        }
+
+    }
+
+    total_damage_by_teams = total_damage_by_teams.sort((team1, team2) => team2.damage - team1.damage);
+
+    return total_damage_by_teams;
+}
+
+function CreateEmptyPlayerDamageArray(players, playerName, teams){
+    
+    let damage_by_player = [];
+
+    for(let i in players)
+    {
+        let player = players[i]
+
+        if(player.name != playerName){
+            damage_by_player.push({id: player.name, damage: 0, team: player.team});
+        }
+
+    }
+
+    damage_by_player = AddColorToPlayerList(teams, damage_by_player)
+
+    return damage_by_player;
+
+}
+
+app.post('/api/DamageMadeByPlayer', (req, res) => 
+{  
+    let playerName = req.body.name;
+
+    if(playerName == null)
+    {
+        console.log("No hay jugador");
+        return;
+    }
+
+    console.log(`Mandando datos de damage a ${playerName}`);
+
+    db.collection("Teams").find({}).toArray(function(err, teams) {
+
+        if(err) throw err;
+
+        db.collection("Players").find({}).toArray(function(err, players) {
+
+            if(err) throw err;
+    
+            let total_damage_by_player = CreateEmptyPlayerDamageArray(players, playerName, teams);
+
+            let total_damage_received = CreateEmptyPlayerDamageArray(players, playerName, teams);
+
+            db.collection("Hits").find({}).toArray(function(err, hits) {
+    
+                if(err) throw err;
+
+
+    
+                for(let i in hits)
+                {
+                    let enemy = hits[i];
+        
+                    let enemyName = enemy.id;
+        
+                    //Veo quien le hizo damage a enemy y si estoy yo se lo sumo
+                    for(let i in enemy.Hits)
+                    {
+                        let hit = enemy.Hits[i];
+    
+                        if(hit.id == playerName)
+                        {
+                            let enemy_player_index = total_damage_by_player.findIndex(x => x.id == enemyName);                        
+                            total_damage_by_player[enemy_player_index].damage += hit.damage;
+                        }
+
+                        //Los damage que me hicieron
+                        if(enemyName == playerName)
+                        {
+                            console.log("Agrego danos a claudios")
+                            let enemy_player_index = total_damage_received.findIndex(x => x.id == hit.id);                        
+                            total_damage_received[enemy_player_index].damage += hit.damage;
+                        }
+    
+    
+                    }
+                    
+                }
+
+                total_damage_by_player = total_damage_by_player.sort((player1, player2) => player2.damage - player1.damage);
+                total_damage_received = total_damage_received.sort((player1, player2) => player2.damage - player1.damage);
+
+                let stats = {
+                    made: total_damage_by_player,
+                    received: total_damage_received
+                }
+                res.send(stats)
+            })
+    
+    
+        });
+
+    });
+    
+    
+
+});
+
 app.post('/api/TotalDamage', (req, res) => 
 {    
     console.log("Envio ranking")
@@ -260,12 +422,16 @@ app.post('/api/TotalDamage', (req, res) =>
                     return;
                 } 
         
-               let total_damages = CreateTotalDamageArrayFromHits(hits);
+               let total_damage_by_players = CreateTotalDamageArrayFromHits(hits, playersData, teams);
+
+               let total_damage_by_teams = CreateTeamsTotalDamageArrayFromPlayersTotalDamage(total_damage_by_players, playersData, teams);
     
-               total_damages = AddColorsToHitsList(total_damages, playersData, teams);
-    
-               //Mandar el resultado
-               res.send(total_damages);
+
+               let rankings = {
+                   TotalDamagePlayers: total_damage_by_players,
+                   TotalDamageTeams: total_damage_by_teams
+               }
+               res.send(rankings);
             });
     
         });
