@@ -115,7 +115,7 @@ app.post('/api/Start', (req, res) =>
             LivePlayersData = AddColorToPlayerList(teams, LivePlayersData);
 
             try{
-                LivePlayersData = LivePlayersData.sort((player1, player2) => player2.team.localeCompare(player1.team))
+                LivePlayersData = LivePlayersData.sort((player1, player2) => player1.team.localeCompare(player2.team))
             } catch(e)
             {
 
@@ -190,23 +190,23 @@ app.post('/api/SendPlayerNames', (req, res) =>
 
     const PlayersNames = req.body.players;
 
-    // console.log(PlayersNames)
+    if(PlayersNames != null)
+    {
+        //Clean databases
+        db.collection("Players").deleteMany({}, function(err, result1){
 
-    try {
-        if(PlayersNames != null)
-        {
-            //Clean databases
-            db.collection("Players").remove({});
             //db.collection("Hits").remove({});
 
-            //Add players names
-            db.collection("Players").insertMany(PlayersNames);
-        }
+            if(err) throw err;
+
+            db.collection("Players").insertMany(PlayersNames, function(err, result2){
+                if(err) throw err;
+                res.send({success: true})
+            });       
+        })       
         
-        
-     } catch (e) {
-        console.log(e);
-     }
+    }
+      
 
 });
 
@@ -303,10 +303,10 @@ function AddColorsToHitsList(hits, playersData, teams)
                 hits[i].color = color;
             } else
             {
-                hits[i].color = "#8d8d8d";
+                hits[i].color = "#8d8d8d60";
             }
         } else{
-            hits[i].color = "#8d8d8d";
+            hits[i].color = "#8d8d8d60";
         }
 
         

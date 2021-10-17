@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
@@ -17,6 +17,16 @@ import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import axios from 'axios';
+
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 
 const useStyles = makeStyles({
@@ -45,6 +55,23 @@ export default function InteractiveList(props) {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
 
+    const [loading, setLoading] = useState(false);
+
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleAcceptDialog = () => {
+        setOpen(false);
+        SendPlayersNames();
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     useEffect( () => {
 
         const receivePlayers = async () => {
@@ -67,13 +94,47 @@ export default function InteractiveList(props) {
     }
 
     const SendPlayersNames = () => {
+        notify();
         console.log("Envio los nombres: " , data)
-        axios.post('/api/SendPlayerNames', {players: data});
+        setLoading(true)
+        axios.post('/api/SendPlayerNames', {players: data})
+        .then( response => {
+            setLoading(false);
+            console.log(response.data)
+        });
+        
     }
 
+    const notify = () => {
+        toast.success('Jugadores enviados con exito', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme:'dark',
+        });
+    };
+
   return (
-   
+
+    
     <Grid container spacing={2}>
+
+        <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        />
+   
 
         <Grid id="row" container>
             <Grid item xs={0} md={4} ></Grid>
@@ -193,13 +254,27 @@ export default function InteractiveList(props) {
             align="center"
             >
                 <Box pt={6}>
+
+
+                    {/* <LoadingButton
+                        onClick={handleClickOpen}
+                        endIcon={<SendIcon />}
+                        loading={loading}
+                        loadingPosition="end"
+                        variant="contained"
+                        disabled = {props.start}
+                    >
+                        Send
+                    </LoadingButton> */}
+
+
+
                     <Button 
                         variant="contained" 
                         endIcon={<SendIcon />}
                         size = "large"
                         color = "success"
-                        classes={{root: classes.fullHeightButton}}
-                        onClick = {SendPlayersNames}
+                        onClick = {handleClickOpen}
                         disabled = {props.start}
                         >
                             Enviar
@@ -208,6 +283,28 @@ export default function InteractiveList(props) {
             </Grid>
 
         </Grid>
+
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+            {"Enviar jugadores"}
+            </DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                Desea enviar los jugadores?
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={handleClose}>Cancelar</Button>
+            <Button onClick={handleAcceptDialog} autoFocus  color="secondary">
+                Aceptar
+            </Button>
+            </DialogActions>
+        </Dialog>
 
 
     </Grid>

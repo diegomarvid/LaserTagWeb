@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@mui/styles';
+
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 
@@ -19,7 +20,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import NotConnectedIcon from '@mui/icons-material/SignalWifiBad';
 import ConnectedIcon from '@mui/icons-material/Wifi';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import axios from 'axios';
+
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const useStyles = makeStyles({
@@ -43,16 +54,81 @@ function TeamPlayerIcon(props)
     }
 }
 
-function StartGame()
+function StartGame(props)
 {
     axios.post("/api/Start");
     console.log("Starting game...")
+    notify();
+    props.setStart(true);
+}
+
+const notify = () => {
+    toast.success('Juego empezado con exito', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme:'dark',
+    });
+};
+
+
+function AreAllPlayersConected(players)
+{ 
+    for(let i in players)
+    {
+        let player = players[i];
+
+        if(player.team == null)
+        { 
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
 export default function ConexionList(props) {
 
     const classes = useStyles();
+
+    const [open, setOpen] = useState(false);
+
+    const [data, setData] = useState([
+        {id: 'c', name: 'Diego'},
+        {id: 'a', name: "Otte"},
+        {id: 'b', name: "Claudio"},
+        {id: 'd', name: "Torreta"}
+    ])
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleAcceptDialog = () => {
+        setOpen(false);
+        StartGame(props);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    function HandleStartGameClick(props)
+    {
+        // StartGame();
+
+        if(AreAllPlayersConected(data)){
+            StartGame(props);
+        } else{
+            handleClickOpen();
+        }
+
+    }
 
     
     useEffect( () => {
@@ -62,34 +138,29 @@ export default function ConexionList(props) {
             const result = await axios.post('/api/ReceivePlayers', {});
             const players = result.data;
             setData(players);
+            console.log(players)
         }
 
         receivePlayers();
     
     },[])
     
-
-    const [data, setData] = useState([
-        {id: 'c', name: 'Diego'},
-        {id: 'a', name: "Otte"},
-        {id: 'b', name: "Claudio"},
-        {id: 'd', name: "Torreta"}
-    ])
-
-    const [id, setId] = useState('');
-    const [name, setName] = useState('');
-
-    function addPlayer()
-    {
-        let newPlayer = {id: id, name: name};
-        setData([...data, newPlayer])
-        setId('');
-        setName('');
-    }
-
+ 
   return (
    
     <Grid container spacing={2}>
+
+        <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+        />
 
         <Grid id="row" container>
 
@@ -164,14 +235,35 @@ export default function ConexionList(props) {
                         color="success"
                         disabled = {props.start}
                         onClick = {(e) => {
-                            StartGame();
-                            props.setStart(true);
+                            HandleStartGameClick(props);
                         }}
                         >
                             Start
                     </Button>
                 </Box>
             </Grid>
+
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                {"Faltan jugadores"}
+                </DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    No todos los jugadores estan conectados. Desea aun asi empezar el juego?
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose}>Cancelar</Button>
+                <Button onClick={handleAcceptDialog} autoFocus  color="secondary">
+                    Aceptar
+                </Button>
+                </DialogActions>
+            </Dialog>
 
         </Grid>
 
