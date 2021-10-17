@@ -89,6 +89,12 @@ main().catch(console.error);
 
 let GAME_STARTED = false;
 
+app.post('/api/IsGameStarted', (req, res) => 
+{
+    res.send(GAME_STARTED)
+
+});
+
 app.post('/api/Start', (req, res) => 
 {
     console.log("Game has started...")
@@ -108,7 +114,13 @@ app.post('/api/Start', (req, res) =>
 
             LivePlayersData = AddColorToPlayerList(teams, LivePlayersData);
 
-            LivePlayersData = LivePlayersData.sort((player1, player2) => player2.team.localeCompare(player1.team))
+            try{
+                LivePlayersData = LivePlayersData.sort((player1, player2) => player2.team.localeCompare(player1.team))
+            } catch(e)
+            {
+
+            }
+            
 
             console.log(LivePlayersData)
 
@@ -137,7 +149,13 @@ app.post('/api/ReceivePlayers', (req, res) =>
         {
             if (err) throw err;
     
-            let players = result;
+            let players = [];
+
+            for(let i in result)
+            {
+                let player = result[i];
+                players.push({id: player.id, team: player.team, name: player.name})
+            }
 
             players = AddColorToPlayerList(teams,players);
     
@@ -172,7 +190,7 @@ app.post('/api/SendPlayerNames', (req, res) =>
 
     const PlayersNames = req.body.players;
 
-    console.log(PlayersNames)
+    // console.log(PlayersNames)
 
     try {
         if(PlayersNames != null)

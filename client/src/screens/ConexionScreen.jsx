@@ -37,9 +37,9 @@ function TeamPlayerIcon(props)
 {
     if(props.player.team == null)
     {
-        return <NoTeamIcon sx={{ color: '#8d8d8d'}}/>;
+        return <NoTeamIcon sx={{ color: '#8d8d8d', fontSize: 30}}/>;
     } else{
-        return  <TeamIcon sx={{ color: props.player.color }}/>;
+        return  <TeamIcon sx={{ color: props.player.color, fontSize: 30 }}/>;
     }
 }
 
@@ -47,11 +47,10 @@ function StartGame()
 {
     axios.post("/api/Start");
     console.log("Starting game...")
-  
 }
 
 
-export default function ConexionList() {
+export default function ConexionList(props) {
 
     const classes = useStyles();
 
@@ -71,10 +70,10 @@ export default function ConexionList() {
     
 
     const [data, setData] = useState([
-        {id: 'c', name: 'Diego', team: 'r', color: '#990000'},
+        {id: 'c', name: 'Diego'},
         {id: 'a', name: "Otte"},
-        {id: 'b', name: "Claudio", team: 'r', color: '#990000'},
-        {id: 'd', name: "Torreta", team: 'b', color: '#0000cc'}
+        {id: 'b', name: "Claudio"},
+        {id: 'd', name: "Torreta"}
     ])
 
     const [id, setId] = useState('');
@@ -120,7 +119,7 @@ export default function ConexionList() {
                         edge="end" 
                         aria-label="delete"
                         >
-                            {player.team == null ? <NotConnectedIcon/>: <ConnectedIcon/>}
+                            {player.team == null ? <NotConnectedIcon sx={{fontSize: 30 }}/>: <ConnectedIcon sx={{fontSize: 30 }}/>}
                         </IconButton>
                         }
                     >
@@ -130,9 +129,11 @@ export default function ConexionList() {
                             <TeamPlayerIcon player={player}/>
                         </ListItemIcon> 
 
-                        <ListItemText
-                        primary={player.name}
-                        />
+                        <ListItemText>           
+                            <Typography sx ={{ml: 2}}variant="h6" component="div">
+                                            {player.name}
+                            </Typography>
+                        </ListItemText>
 
                     </ListItem>
 
@@ -161,7 +162,11 @@ export default function ConexionList() {
                         size = "large"
                         classes={{root: classes.fullHeightButton}}
                         color="success"
-                        onClick = {StartGame}
+                        disabled = {props.start}
+                        onClick = {(e) => {
+                            StartGame();
+                            props.setStart(true);
+                        }}
                         >
                             Start
                     </Button>

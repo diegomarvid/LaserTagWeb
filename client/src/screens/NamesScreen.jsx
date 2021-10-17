@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 
+
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
@@ -32,7 +33,7 @@ const useStyles = makeStyles({
  
 
 
-export default function InteractiveList() {
+export default function InteractiveList(props) {
 
     const classes = useStyles();
 
@@ -114,8 +115,7 @@ export default function InteractiveList() {
                         /> 
 
                         <ListItemText
-                        primary={player.name}
-                        fontSize = "15"
+                        primary={<Typography variant="h6">{player.name}</Typography>}
                         />
 
                     </ListItem>
@@ -143,9 +143,9 @@ export default function InteractiveList() {
 
         <Grid id="row" container spacing = {1}>
 
-            <Grid item xs={3} md={4} ></Grid>
+            <Grid item xs={1} md={4} ></Grid>
 
-            <Grid item xs={3} md={2} align = "center">
+            <Grid item xs={4} md={2} align = "center">
 
                 <TextField 
                 id="idText" 
@@ -157,7 +157,7 @@ export default function InteractiveList() {
 
             </Grid>
 
-            <Grid item xs={3} md={2}>
+            <Grid item xs={4} md={2}>
 
                 <TextField 
                 id="nombreText" 
@@ -169,7 +169,7 @@ export default function InteractiveList() {
 
             </Grid> 
 
-            <Grid item xs={2} md={2}>
+            <Grid item xs={1} md={2}>
                 <IconButton
                 iconStyle ={classes.largeIcon}
                 onClick = {addPlayer}
@@ -183,6 +183,7 @@ export default function InteractiveList() {
             </Grid> 
 
         </Grid>
+
 
         <Grid id="row" container>
 
@@ -199,6 +200,7 @@ export default function InteractiveList() {
                         color = "success"
                         classes={{root: classes.fullHeightButton}}
                         onClick = {SendPlayersNames}
+                        disabled = {props.start}
                         >
                             Enviar
                     </Button>

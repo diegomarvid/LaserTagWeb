@@ -23,9 +23,21 @@ import NamesIcon from '@mui/icons-material/Group';
 import ConnectionIcon from '@mui/icons-material/Wifi';
 import LiveIcon from '@mui/icons-material/LiveTv';
 
+import Lottie from 'react-lottie';
+import liveAnimation from '../animations/live2';
+
 import { useHistory } from 'react-router-dom';
 
 const drawerWidth = 240;
+
+const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  animationData: liveAnimation,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice"
+  }
+};
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -72,7 +84,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function PersistentDrawerLeft() {
+export default function PersistentDrawerLeft(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -163,7 +175,20 @@ export default function PersistentDrawerLeft() {
                 </ListItemIcon>
 
                 <ListItemText primary="Live" />
+                
+                {props.start ?
+                  <Lottie 
+                  options={defaultOptions}
+                  height={50}
+                  width={50}
+                  />
+                  :
+                  <></>
+                }
+                
             </ListItem>
+
+       
 
             <ListItem button key="ranking"
             onClick = {handleRankingClick}
@@ -173,9 +198,15 @@ export default function PersistentDrawerLeft() {
                 </ListItemIcon>
 
                 <ListItemText primary="Ranking" />
+
             </ListItem>
 
-            <ListItem button key="names"
+           
+
+        </List>
+        <Divider />
+
+        <ListItem button key="names"
             onClick = {handleConfigClick}
             >
                 <ListItemIcon>
@@ -194,19 +225,6 @@ export default function PersistentDrawerLeft() {
 
                 <ListItemText primary="Conexiones" />
             </ListItem>
-
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
       <Main open={open}>
         <DrawerHeader />

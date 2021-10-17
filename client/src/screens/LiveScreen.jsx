@@ -2,7 +2,9 @@ import React, {useState, useEffect} from 'react';
 import { io } from "socket.io-client";
 
 import {
-    Grid
+    Grid,
+    Box,
+    Typography
 } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -13,9 +15,29 @@ import TeamIcon from '@mui/icons-material/Group';
 import AliveIcon from '@mui/icons-material/Favorite';
 import DeadIcon from '@mui/icons-material/DeleteForever';
 
-import ConnectedIcon from '@mui/icons-material/Wifi';
+import Lottie from 'react-lottie';
+import liveAnimation from '../animations/live2';
+import heartAnimation from '../animations/heart';
 
-function LiveScreen()
+const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: liveAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
+  const defaultOptions2 = {
+    loop: true,
+    autoplay: true,
+    animationData: heartAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
+function LiveScreen(props)
 {
 
     const [liveData, setLiveData] = useState([]);
@@ -36,38 +58,70 @@ function LiveScreen()
 
         <>
         <Grid container>
-            <Grid item xs={10} md={6}>
 
+            <Grid container id="row" align = "center">
+
+                <Grid item xs={12} md={12} lg={12}>
+
+                {props.start ?
+                    <Lottie 
+                        options={defaultOptions}
+                        height={100}
+                        width={100}
+                    />
+                    :
+                    <></>
+                }
+
+                </Grid>
+            
+            </Grid>
+
+            <Grid item xs={0} sm={0} md={3} lg = {4}></Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg = {4}>
+
+            
                 <List>
 
                 {liveData.map( (player) => (
 
-                    <ListItem
-                        key = {player.id}
-                        secondaryAction={
-                        <IconButton 
-                        edge="end" 
-                        aria-label="delete"
+                    <Grid container id="row">
+
+                        <ListItem
+                            key = {player.id}                        
                         >
-                          
-                            {player.alive ?
-                            <AliveIcon sx={{ color: '#ff3232'}}/> :
-                            <DeadIcon/>
-                            }
-                           
-                        </IconButton>
-                        }
-                    >
-                        
-                        <ListItemIcon> 
-                            <TeamIcon sx={{ color: player.color }}/>
-                        </ListItemIcon>
+                            <Grid item xs={2} md={2}></Grid>
+                            <Grid item xs={2} md={2}>
+                                <ListItemIcon> 
+                                    <TeamIcon sx={{ color: player.color, fontSize: 40 }}/>
+                                </ListItemIcon>            
+                            </Grid>
+                            
+                            <Grid item xs={4} md={4}>
+                                <ListItemText>
+                                    <Typography sx ={{ml: 2}}variant="h6" component="div">
+                                        {player.id}
+                                    </Typography>
+                                </ListItemText>
+                            </Grid>
 
-                        <ListItemText
-                        primary={player.id}
-                        />
+                            <Grid item xs={4} md={4}>
+                                {player.alive ?
+                                    <Lottie 
+                                    options={defaultOptions2}
+                                    height={30}
+                                    width={30}
+                                    /> :
+                                    <Box pr={0.4}>
+                                        <DeadIcon/>
+                                    </Box>
+                                }
+                            </Grid>
 
-                    </ListItem>
+                        </ListItem>
+
+                    </Grid>
 
                 ))}
                     
