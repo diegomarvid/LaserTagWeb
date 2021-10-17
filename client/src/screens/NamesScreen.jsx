@@ -85,8 +85,42 @@ export default function InteractiveList(props) {
     
     },[])
 
+    function IdAlreadyExists(newId)
+    {
+        return  data.filter((x) => x.id == newId).length > 0;
+    }
+
+    function NameAlreadyExists(newName)
+    {
+        return  data.filter((x) => x.name == newName).length > 0;
+    }
+
     function addPlayer()
     {
+
+        //Chequear si es vacio y eso
+        if(id.length == 0){
+            errorNotify("El id no puede estar vacio")
+            return;
+        }
+
+        if(name.length == 0){
+            errorNotify("El nombre no puede estar vacio")
+            return;
+        }
+
+        if(IdAlreadyExists(id)){
+            errorNotify(`El id [${id}] ya esta ingresado`);
+            return;
+        }
+
+        if(NameAlreadyExists(name)){
+            errorNotify(`El nombre [${name}] ya esta ingresado`);
+            return;
+        }
+
+        console.log(IdAlreadyExists(id));
+
         let newPlayer = {id: id, name: name};
         setData([...data, newPlayer])
         setId('');
@@ -107,6 +141,19 @@ export default function InteractiveList(props) {
 
     const notify = () => {
         toast.success('Jugadores enviados con exito', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme:'dark',
+        });
+    };
+
+    const errorNotify = (msg) => {
+        toast.error(msg, {
             position: "top-right",
             autoClose: 2000,
             hideProgressBar: false,
@@ -213,7 +260,10 @@ export default function InteractiveList(props) {
                 label="Id" 
                 variant="outlined" 
                 value={id}
-                onInput={ e => setId(e.target.value)}
+                onInput={ e => {
+                    e.target.value = e.target.value.slice(0,1);
+                    setId(e.target.value)
+                }}
                 />
 
             </Grid>
@@ -225,7 +275,10 @@ export default function InteractiveList(props) {
                 label="Nombre" 
                 variant="outlined" 
                 value={name} 
-                onInput={ e => setName(e.target.value)}
+                onInput={ e => {
+                    e.target.value = e.target.value.slice(0,10);
+                    setName(e.target.value);
+                }}
                 />
 
             </Grid> 
@@ -254,21 +307,6 @@ export default function InteractiveList(props) {
             align="center"
             >
                 <Box pt={6}>
-
-
-                    {/* <LoadingButton
-                        onClick={handleClickOpen}
-                        endIcon={<SendIcon />}
-                        loading={loading}
-                        loadingPosition="end"
-                        variant="contained"
-                        disabled = {props.start}
-                    >
-                        Send
-                    </LoadingButton> */}
-
-
-
                     <Button 
                         variant="contained" 
                         endIcon={<SendIcon />}

@@ -126,6 +126,8 @@ app.post('/api/Start', (req, res) =>
 
             client.publish(StartTopic, "");
             GAME_STARTED = true;
+            //db.collection("Hits").deleteMany({});
+
         
         });
 
@@ -194,8 +196,6 @@ app.post('/api/SendPlayerNames', (req, res) =>
     {
         //Clean databases
         db.collection("Players").deleteMany({}, function(err, result1){
-
-            //db.collection("Hits").remove({});
 
             if(err) throw err;
 
