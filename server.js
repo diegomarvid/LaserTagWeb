@@ -3,6 +3,7 @@ var mqtt = require('mqtt');
 const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet') // creates headers that protect from attacks (security)
+const bodyParser = require('body-parser')
 
 const MongoClient = require('mongodb').MongoClient;
 
