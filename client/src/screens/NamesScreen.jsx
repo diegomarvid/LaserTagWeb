@@ -75,10 +75,16 @@ export default function InteractiveList(props) {
     useEffect( () => {
 
         const receivePlayers = async () => {
- 
-            const result = await axios.post('/api/ReceivePlayers', {});
-            const players = result.data;
-            setData(players);
+            
+            try{
+                const result = await axios.post('/api/ReceivePlayers', {});
+                const players = result.data;
+                setData(players);
+            } catch(error)
+            {
+                console.log(error.response)
+            }
+            
         }
 
         receivePlayers();
@@ -128,14 +134,20 @@ export default function InteractiveList(props) {
     }
 
     const SendPlayersNames = () => {
-        notify();
+        
         console.log("Envio los nombres: " , data)
         setLoading(true)
+
         axios.post('/api/SendPlayerNames', {players: data})
         .then( response => {
             setLoading(false);
             console.log(response.data)
-        });
+            notify();
+        })
+        .catch(error => {
+            console.log(error.response.status)
+            errorNotify("Conexion perdida con el servidor")
+        })
         
     }
 
@@ -204,6 +216,7 @@ export default function InteractiveList(props) {
                 {data.map( (player) => (
 
                     <ListItem
+                        key = {player.id}
                         secondaryAction={
                         <IconButton 
                         edge="end" 

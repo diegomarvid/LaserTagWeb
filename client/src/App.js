@@ -52,9 +52,14 @@ function App() {
     //pedir estado del juego
     const setGameInitialState = async () => {
  
-      const result = await axios.post('/api/IsGameStarted', {});
-      const gameInitialState = result.data;
-      setStart(gameInitialState);
+      try{
+        const result = await axios.post('/api/IsGameStarted', {});
+        const gameInitialState = result.data;
+        setStart(gameInitialState);
+      } catch(error){
+        console.log(error.response.data)
+      }
+      
     }
 
     setGameInitialState();

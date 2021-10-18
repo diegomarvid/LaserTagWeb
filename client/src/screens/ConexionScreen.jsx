@@ -56,14 +56,34 @@ function TeamPlayerIcon(props)
 
 function StartGame(props)
 {
-    axios.post("/api/Start");
-    console.log("Starting game...")
-    notify();
-    props.setStart(true);
+    axios.post("/api/Start")
+    .then(response => {
+        console.log("Starting game...")
+        notify();
+        props.setStart(true);
+    })
+    .catch(error => {
+        console.log(error.response.data);
+        errorNotify("Conexion perdida con el servidor");
+    });
+   
 }
 
 const notify = () => {
     toast.success('Juego empezado con exito', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme:'dark',
+    });
+};
+
+const errorNotify = (msg) => {
+    toast.error(msg, {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,

@@ -37,41 +37,43 @@ const defaultOptions = {
     }
   };
 
-function LiveScreen(props)
+function NotStarted(props)
 {
 
-    const [liveData, setLiveData] = useState([]);
-
-    useEffect(() => {
-
-        const socket = io();
-
-        socket.on("live", data => {
-            setLiveData(data);
-            console.log(data)
-        });
-
-      }, []);
-    
-
     return(
-
         <>
-        <Grid container>
+        <Grid container id="row" align = "center">
+            <Grid item xs={12} md={12} lg={12}>
+                <Typography sx ={{ml: 2}}variant="h4" component="div">
+                    El juego no ha comenzado
+                </Typography>
+            </Grid>
+        </Grid>
+        </>
+    )
 
-            <Grid container id="row" align = "center">
+}
 
-                <Grid item xs={12} md={12} lg={12}>
 
-                {props.start ?
-                    <Lottie 
-                        options={defaultOptions}
-                        height={100}
-                        width={100}
-                    />
-                    :
-                    <></>
-                }
+function LiveList(props)
+{
+
+    return (
+
+    <>
+
+    <Grid container id="row" align = "center">
+
+            <Grid item xs={12} md={12} lg={12}>
+
+            
+                <Lottie 
+                    options={defaultOptions}
+                    height={100}
+                    width={100}
+                />
+                   
+                
 
                 </Grid>
             
@@ -84,7 +86,7 @@ function LiveScreen(props)
             
                 <List>
 
-                {liveData.map( (player) => (
+                {props.liveData.map( (player) => (
 
                     <Grid container id="row">
 
@@ -106,7 +108,7 @@ function LiveScreen(props)
                                 </ListItemText>
                             </Grid>
 
-                            <Grid item xs={4} md={4}>
+                            <Grid item xs={4} md={4} align = "center">
                                 {player.alive ?
                                     <Lottie 
                                     options={defaultOptions2}
@@ -129,6 +131,42 @@ function LiveScreen(props)
                 </List>
 
             </Grid>
+
+    </>
+
+    );
+    
+}  
+
+function LiveScreen(props)
+{
+
+    const [liveData, setLiveData] = useState([]);
+
+    useEffect(() => {
+
+        const socket = io();
+
+        socket.on("live", data => {
+            setLiveData(data);
+            console.log(data)
+        });
+
+      }, []);
+    
+
+    return(
+
+        <>
+        <Grid container>
+
+        {props.start ?
+            <LiveList start = {props.start} liveData = {liveData}/>
+        :
+            <NotStarted/>
+        }
+        
+            
         </Grid>
         </>
 

@@ -37,29 +37,25 @@ let io = require('socket.io')(server, {});
 
 io.sockets.on('connection', function(socket) {
 
+    if(GAME_STARTED)
+    {
+        io.sockets.emit('live', LivePlayersData);
+    }
+    
+
     socket.on('disconnect', function() {
         console.log('socket disconnection')
     });
 
 });
 
-let LivePlayersData = [];
-
-setInterval(function() {
-
-    if(GAME_STARTED)
-    {
-        io.sockets.emit('live', LivePlayersData);
-    }
-    
-      
-
-}, 1000)
 
 // ************************* MONGO DB ******************************** //
 
 
 let db;
+
+let LivePlayersData = [];
 
 
 async function main(){
@@ -74,6 +70,20 @@ async function main(){
         console.log("Connected to MongoDB successfully")
   
         db = client_mongodb.db("Turret");
+
+        db.collection("Status").findOne({id: "started"}, function(err, result){
+            
+            GAME_STARTED = result.status;
+
+        })
+
+        db.collection("Teams").find({}).toArray(function(err, teams)
+        {
+            db.collection("Players").find({}).toArray(function(err, players)
+            {
+                LivePlayersData = CreateLiveDataFromPlayers(players, teams);
+            });
+        });
 
         
     } catch (e) {
@@ -91,13 +101,46 @@ let GAME_STARTED = false;
 
 app.post('/api/IsGameStarted', (req, res) => 
 {
-    res.send(GAME_STARTED)
+    db.collection("Status").findOne({id: "started"}, function(err, result){
+            
+        GAME_STARTED = result.status;
+
+        res.send(GAME_STARTED)
+
+    })
+
+    
 
 });
+
+function CreateLiveDataFromPlayers(players, teams)
+{
+
+    let liveData = [];
+
+    for(let i in players)
+    {
+        let player = players[i];
+        liveData.push({id: player.name, team: player.team, alive:player.alive});
+    }
+
+    liveData = AddColorToPlayerList(teams, liveData);
+
+    try{
+        liveData = liveData.sort((player1, player2) => player1.team.localeCompare(player2.team))
+    } catch(e)
+    {
+
+    }
+
+    return liveData;
+}
 
 app.post('/api/Start', (req, res) => 
 {
     console.log("Game has started...")
+
+   
 
     db.collection("Teams").find({}).toArray(function(err, teams)
     {
@@ -106,26 +149,15 @@ app.post('/api/Start', (req, res) =>
         db.collection("Players").find({}).toArray(function(err, players)
         {
             
-            for(let i in players)
-            {
-                let player = players[i];
-                LivePlayersData.push({id: player.name, team: player.team, alive:true});
-            }
+            LivePlayersData = CreateLiveDataFromPlayers(players, teams);
 
-            LivePlayersData = AddColorToPlayerList(teams, LivePlayersData);
-
-            try{
-                LivePlayersData = LivePlayersData.sort((player1, player2) => player1.team.localeCompare(player2.team))
-            } catch(e)
-            {
-
-            }
+            io.sockets.emit('live', LivePlayersData);
             
-
             console.log(LivePlayersData)
 
             client.publish(StartTopic, "");
             GAME_STARTED = true;
+            db.collection("Status").updateOne({id: "started"}, {$set: {status: true}})
             //db.collection("Hits").deleteMany({});
 
         
@@ -191,6 +223,12 @@ app.post('/api/SendPlayerNames', (req, res) =>
     if(GAME_STARTED) return;
 
     const PlayersNames = req.body.players;
+
+    for(let i in PlayersNames)
+    {
+        PlayersNames[i].alive = true;
+
+    }
 
     if(PlayersNames != null)
     {
@@ -604,7 +642,12 @@ function HandleDieTopic()
 
                 //Setear persona muerta en live array
                 let deadPersonIndex = LivePlayersData.findIndex((x) => x.id == player.name);
-                LivePlayersData[deadPersonIndex].alive = false;
+                if(deadPersonIndex != -1)
+                {
+                    LivePlayersData[deadPersonIndex].alive = false;
+                }
+                
+                io.sockets.emit('live', LivePlayersData);
 
                 db.collection("Teams").find({}).toArray(function(err, teams){
                     

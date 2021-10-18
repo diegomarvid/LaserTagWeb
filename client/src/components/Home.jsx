@@ -1,12 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios'
-import {Chart} from './BarChart'
+import axios from 'axios';
+import ImageCard from './ImageCard';
+
+import image1 from '../images/lasertag.PNG';
+import image2 from '../images/stats.PNG';
+import image3 from '../images/turret.png';
+
 
 import {
   Box,
   Button,
   Grid,
-  Paper
+  Paper,
+  Typography
  
 } from '@mui/material';
 
@@ -31,14 +37,29 @@ function Home()
     return (
         <div>
           <Grid container>
-            <Grid item xs = {12} md = {4}>
+            <Grid container id="row" align = "center">
+              <Grid item xs={12} md={12} lg={12}>
+                  <Typography sx ={{ml: 2}}variant="h4" component="div">
+                      Bienvenido a Laser Tag vs Machine
+                  </Typography>
+              </Grid>
             </Grid>
 
-            <Grid item xs = {12} md = {5}>
-                <h1>Bienvenido a Laser Tag vs Kid Killer Machine</h1>
-            </Grid>
+          
+            <Grid container id="row" align = "center">
 
-            <Grid item xs = {12} md = {2}>
+              <Grid item xs={12} md={12} lg={4}>
+                  <ImageCard title ="Variedades de canchas" subtitle="Hasta 5 canchas completamente diferentes" image = {image1}/>
+              </Grid>
+
+              <Grid item xs={12} md={12} lg={4}>
+                  <ImageCard title ="Estadisticas personalizadas" subtitle="Puedes comparar con tus amigos los daños que hicieron para ver realmente quien es el mejor jugador." image = {image2}/>
+              </Grid>
+
+              <Grid item xs={12} md={12} lg={4}>
+                  <ImageCard title ="Torretas guardianas" subtitle="Las canchas cuentan con torretas equipadas con inteligecia artificial para hacer la experiencia aun mas divertida." image = {image3}/>
+              </Grid>
+
             </Grid>
           </Grid>
         </div>

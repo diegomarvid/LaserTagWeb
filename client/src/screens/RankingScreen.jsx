@@ -16,6 +16,24 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
+
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
+const errorNotify = (msg) => {
+    toast.error(msg, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme:'dark',
+    });
+};
+
 function RankingScreen()
 {
     const [TotalDamagePlayersChartData, setTotalDamagePlayersChartData] = useState({labels: [], data: [], color: []});
@@ -30,36 +48,51 @@ function RankingScreen()
     
 
     const receivePlayerNames = async () => {
-        const res = await axios.post("/api/GetPlayerNames");
 
-        setPlayerNames(res.data);
-        console.log(res.data);
+        try{
+            const res = await axios.post("/api/GetPlayerNames");
+            setPlayerNames(res.data);
+            console.log(res.data);
+        }
+        catch(error){
+            console.log(error.response.data)
+        }
+       
 
     };
 
     const receiveTotalDamages = async () => {
-        const res = await axios.post("/api/TotalDamage");
-  
-        let TotalDamagePlayers = res.data.TotalDamagePlayers;
 
 
-        setTotalDamagePlayersChartData({
+        try{
 
-          labels: TotalDamagePlayers.map((player) => player.id),
-          data: TotalDamagePlayers.map((player) => player.damage),
-          colors: TotalDamagePlayers.map((player) => player.color)
-            
-        });
+            const res = await axios.post("/api/TotalDamage");
+    
+            let TotalDamagePlayers = res.data.TotalDamagePlayers;
 
-        let TotalDamageTeams = res.data.TotalDamageTeams;
 
-        setTotalDamageTeamsChartData({
+            setTotalDamagePlayersChartData({
 
-            labels: TotalDamageTeams.map((player) => player.id),
-            data: TotalDamageTeams.map((player) => player.damage),
-            colors: TotalDamageTeams.map((player) => player.color)
-              
-        });
+            labels: TotalDamagePlayers.map((player) => player.id),
+            data: TotalDamagePlayers.map((player) => player.damage),
+            colors: TotalDamagePlayers.map((player) => player.color)
+                
+            });
+
+            let TotalDamageTeams = res.data.TotalDamageTeams;
+
+            setTotalDamageTeamsChartData({
+
+                labels: TotalDamageTeams.map((player) => player.id),
+                data: TotalDamageTeams.map((player) => player.damage),
+                colors: TotalDamageTeams.map((player) => player.color)
+                
+            });
+
+        }catch(error){
+            console.log(error.response.data)
+            errorNotify("Conexion perdida con el servidor");
+        }
     };
 
     function GetDamageByPlayer()
@@ -107,6 +140,18 @@ function RankingScreen()
 
         <>
         <Grid container spacing={0}>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
 
             <Grid container id="row">
 
