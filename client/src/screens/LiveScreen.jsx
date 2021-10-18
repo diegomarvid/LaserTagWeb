@@ -18,6 +18,7 @@ import DeadIcon from '@mui/icons-material/DeleteForever';
 import Lottie from 'react-lottie';
 import liveAnimation from '../animations/live2';
 import heartAnimation from '../animations/heart';
+import waitAnimation from '../animations/wait';
 
 const defaultOptions = {
     loop: true,
@@ -37,18 +38,42 @@ const defaultOptions = {
     }
   };
 
+  const defaultOptions3 = {
+    loop: true,
+    autoplay: true,
+    animationData: waitAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
 function NotStarted(props)
 {
 
     return(
         <>
         <Grid container id="row" align = "center">
+            
             <Grid item xs={12} md={12} lg={12}>
-                <Typography sx ={{ml: 2}}variant="h4" component="div">
-                    El juego no ha comenzado
-                </Typography>
+                <Box sx ={{pt:2}}>
+                    <Typography variant="h4" component="div">
+                        El juego no ha comenzado 
+                    </Typography>
+                </Box>
+            </Grid>
+            
+        </Grid>
+
+        <Grid container id="row" align = "center">
+            <Grid item xs={12} md={12} lg={12}>
+                <Lottie 
+                    options={defaultOptions3}
+                    height={200}
+                    width={400}
+                />
             </Grid>
         </Grid>
+  
         </>
     )
 

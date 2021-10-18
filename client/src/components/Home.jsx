@@ -48,8 +48,9 @@ function Home()
           
             <Grid container id="row" align = "center">
 
+
               <Grid item xs={12} md={12} lg={4}>
-                  <ImageCard title ="Variedades de canchas" subtitle="Hasta 5 canchas completamente diferentes" image = {image1}/>
+                  <ImageCard title ="Torretas guardianas" subtitle="Las canchas cuentan con torretas equipadas con inteligecia artificial para hacer la experiencia aun mas divertida." image = {image3}/>
               </Grid>
 
               <Grid item xs={12} md={12} lg={4}>
@@ -57,8 +58,12 @@ function Home()
               </Grid>
 
               <Grid item xs={12} md={12} lg={4}>
-                  <ImageCard title ="Torretas guardianas" subtitle="Las canchas cuentan con torretas equipadas con inteligecia artificial para hacer la experiencia aun mas divertida." image = {image3}/>
+                  <ImageCard title ="Variedades de canchas" subtitle="Hasta 5 canchas completamente diferentes" image = {image1}/>
               </Grid>
+
+              
+
+              
 
             </Grid>
           </Grid>
