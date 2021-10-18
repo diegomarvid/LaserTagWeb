@@ -28,6 +28,17 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+import Lottie from 'react-lottie';
+import loadingAnimation from '../animations/loading';
+
+const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loadingAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+};
 
 const useStyles = makeStyles({
     fullHeightButton: {
@@ -41,7 +52,43 @@ const useStyles = makeStyles({
   });
 
  
+function NamesList(props)
+{
+    return (
+            <List>
 
+            {props.data.map( (player) => (
+
+                <ListItem
+                    key = {player.id}
+                    secondaryAction={
+                    <IconButton 
+                    edge="end" 
+                    aria-label="delete"
+                    onClick = {() => {
+                        let newData = props.data.filter(function(x) { return x.id != player.id; }); 
+                        props.setData(newData)
+                    }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                    }
+                >
+                    
+                    <ListItemText
+                    primary={ <Typography variant="h5" style={{ color: '#ffffff65' }}>{player.id}</Typography>}
+                    /> 
+
+                    <ListItemText
+                    primary={<Typography variant="h6">{player.name}</Typography>}
+                    />
+
+                </ListItem>
+
+            ))}
+            </List>
+    );
+}
 
 export default function InteractiveList(props) {
 
@@ -55,7 +102,7 @@ export default function InteractiveList(props) {
     const [id, setId] = useState('');
     const [name, setName] = useState('');
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [open, setOpen] = useState(false);
 
@@ -80,6 +127,7 @@ export default function InteractiveList(props) {
                 const result = await axios.post('/api/ReceivePlayers', {});
                 const players = result.data;
                 setData(players);
+                setLoading(false);
             } catch(error)
             {
                 console.log(error.response)
@@ -211,40 +259,16 @@ export default function InteractiveList(props) {
             
             <Grid item xs={10} md={4}>
 
-                <List>
-
-                {data.map( (player) => (
-
-                    <ListItem
-                        key = {player.id}
-                        secondaryAction={
-                        <IconButton 
-                        edge="end" 
-                        aria-label="delete"
-                        onClick = {() => {
-                            let newData = data.filter(function(x) { return x.id != player.id; }); 
-                            setData(newData)
-                        }}
-                        >
-                            <DeleteIcon />
-                        </IconButton>
-                        }
-                    >
-                        
-                        <ListItemText
-                        primary={ <Typography variant="h5" style={{ color: '#ffffff65' }}>{player.id}</Typography>}
-                        /> 
-
-                        <ListItemText
-                        primary={<Typography variant="h6">{player.name}</Typography>}
-                        />
-
-                    </ListItem>
-
-                ))}
-                    
-        
-                </List>
+                {loading ?
+                    <Lottie 
+                    options={defaultOptions}
+                    height={200}
+                    width={200}
+                    />
+                :
+                    <NamesList data={data} setData={setData}/>
+                }
+                
 
             </Grid>
 

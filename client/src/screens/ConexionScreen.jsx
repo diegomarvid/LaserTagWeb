@@ -32,6 +32,17 @@ import { ToastContainer, toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
+import Lottie from 'react-lottie';
+import loadingAnimation from '../animations/loading';
+
+const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loadingAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+};
 
 const useStyles = makeStyles({
     fullHeightButton: {
@@ -112,11 +123,52 @@ function AreAllPlayersConected(players)
 }
 
 
+function PlayersList(props)
+{
+
+    return (
+        <List>
+
+            {props.data.map( (player) => (
+
+                <ListItem
+                    key = {player.id}
+                    secondaryAction={
+                    <IconButton 
+                    edge="end" 
+                    aria-label="delete"
+                    >
+                        {player.team == null ? <NotConnectedIcon sx={{fontSize: 30 }}/>: <ConnectedIcon sx={{fontSize: 30 }}/>}
+                    </IconButton>
+                    }
+                >
+                    
+                    
+                    <ListItemIcon> 
+                        <TeamPlayerIcon player={player}/>
+                    </ListItemIcon> 
+
+                    <ListItemText>           
+                        <Typography sx ={{ml: 2}}variant="h6" component="div">
+                                        {player.name}
+                        </Typography>
+                    </ListItemText>
+
+                </ListItem>
+
+            ))}
+                
+        </List>
+    )
+}
+
 export default function ConexionList(props) {
 
     const classes = useStyles();
 
     const [open, setOpen] = useState(false);
+
+    const [loading, setLoading] = useState(true);
 
     const [data, setData] = useState([
         {id: 'c', name: 'Diego'},
@@ -155,10 +207,17 @@ export default function ConexionList(props) {
 
         const receivePlayers = async () => {
  
-            const result = await axios.post('/api/ReceivePlayers', {});
-            const players = result.data;
-            setData(players);
-            console.log(players)
+            try{
+                const result = await axios.post('/api/ReceivePlayers', {});
+                const players = result.data;
+                setData(players);
+                setLoading(false);
+                console.log(players)
+            }catch(error)
+            {
+                console.log(error);
+            }
+            
         }
 
         receivePlayers();
@@ -199,40 +258,16 @@ export default function ConexionList(props) {
             
             <Grid item xs={10} md={4}>
 
-                <List>
-
-                {data.map( (player) => (
-
-                    <ListItem
-                        key = {player.id}
-                        secondaryAction={
-                        <IconButton 
-                        edge="end" 
-                        aria-label="delete"
-                        >
-                            {player.team == null ? <NotConnectedIcon sx={{fontSize: 30 }}/>: <ConnectedIcon sx={{fontSize: 30 }}/>}
-                        </IconButton>
-                        }
-                    >
-                        
-                        
-                        <ListItemIcon> 
-                            <TeamPlayerIcon player={player}/>
-                        </ListItemIcon> 
-
-                        <ListItemText>           
-                            <Typography sx ={{ml: 2}}variant="h6" component="div">
-                                            {player.name}
-                            </Typography>
-                        </ListItemText>
-
-                    </ListItem>
-
-                ))}
-                    
-        
-                </List>
-
+                {loading ?
+                    <Lottie 
+                    options={defaultOptions}
+                    height={200}
+                    width={200}
+                    />
+                :
+                    <PlayersList data={data}/>
+                }
+                
             </Grid>
 
         </Grid>
