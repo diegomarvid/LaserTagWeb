@@ -359,6 +359,16 @@ export default function InteractiveList(props) {
 
         </Grid>
 
+        <Grid id="row" container>
+            <Grid item xs={12} md={12} align="center">
+                <Box pt={6}>
+                    <Typography sx={{ mt: 0, mb: 0 }} variant="h5" component="div">
+                            Enviar Lista
+                    </Typography>
+                </Box>
+            </Grid>
+        </Grid>
+
 
         <Grid id="row" container>
 
@@ -367,7 +377,7 @@ export default function InteractiveList(props) {
             <Grid item xs={6} md={4}
             align="center"
             >
-                <Box pt={6}>
+                <Box pt={2}>
                     <Button 
                         variant="contained" 
                         endIcon={<SendIcon />}

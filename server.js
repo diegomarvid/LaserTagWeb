@@ -226,6 +226,8 @@ app.post('/api/ReceivePlayers', (req, res) =>
             }
 
             players = AddColorToPlayerList(teams,players);
+
+            players = players.sort((player1, player2) => player1.id.localeCompare(player2.id));
     
             res.send(players)
         })
@@ -296,6 +298,9 @@ app.post('/api/GetPlayerNames', (req, res) =>
             let player = players[i];
             playersNames.push(player.name);
         }
+
+        playersNames = playersNames.sort((player1, player2) => player1.localeCompare(player2));
+
 
         res.send(playersNames);
     });
