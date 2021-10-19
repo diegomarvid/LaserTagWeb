@@ -181,12 +181,8 @@ app.post('/api/Start', (req, res) =>
 {
     console.log("Game has started...")
 
-   
-
     db.collection("Teams").find({}).toArray(function(err, teams)
     {
-
-
         db.collection("Players").find({}).toArray(function(err, players)
         {
             
@@ -194,13 +190,12 @@ app.post('/api/Start', (req, res) =>
 
             io.sockets.emit('live', LivePlayersData);
             
-            console.log(LivePlayersData)
-
-            client.publish(StartTopic, "");
+            client.publish(StartTopic, "started");
             GAME_STARTED = true;
             db.collection("Status").updateOne({id: "started"}, {$set: {status: true}})
             //db.collection("Hits").deleteMany({});
 
+            res.send({success: true})
         
         });
 
@@ -212,8 +207,6 @@ app.post('/api/Start', (req, res) =>
 
 app.post('/api/ReceivePlayers', (req, res) => 
 {
-
-    console.log("Voy a enviar los jugadores...")
 
    db.collection("Teams").find({}).toArray(function(err, teams)
    {
@@ -305,7 +298,6 @@ app.post('/api/GetPlayerNames', (req, res) =>
         }
 
         res.send(playersNames);
-        console.log(playersNames)
     });
     
 

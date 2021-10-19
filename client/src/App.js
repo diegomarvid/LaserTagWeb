@@ -28,14 +28,14 @@ function App() {
     palette: {
       mode: 'dark',
       primary: deepOrange,
-          divider: "#141414",
+          divider: "#2F2F2F",
           background: {
             default: "#1F1B24",
             paper: "#1F1B24",
           },
           text: {
-            primary: '#ffffff',
-            secondary: "#ffffff65",
+            primary: '#ffffffDD',
+            secondary: "#ffffff80",
           },
     },
   });

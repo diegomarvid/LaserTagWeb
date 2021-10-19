@@ -65,20 +65,6 @@ function TeamPlayerIcon(props)
     }
 }
 
-function StartGame(props)
-{
-    axios.post("/api/Start")
-    .then(response => {
-        console.log("Starting game...")
-        notify();
-        props.setStart(true);
-    })
-    .catch(error => {
-        console.log(error.response.data);
-        errorNotify("Conexion perdida con el servidor");
-    });
-   
-}
 
 const notify = () => {
     toast.success('Juego empezado con exito', {
@@ -183,22 +169,34 @@ export default function ConexionList(props) {
 
     const handleAcceptDialog = () => {
         setOpen(false);
-        StartGame(props);
+        StartGame();
     };
 
     const handleClose = () => {
         setOpen(false);
     };
 
-    function HandleStartGameClick(props)
+    function HandleStartGameClick()
     {
-        // StartGame();
-
         if(AreAllPlayersConected(data)){
-            StartGame(props);
+            StartGame();
         } else{
             handleClickOpen();
         }
+    }
+
+    function StartGame()
+    {
+        axios.post("/api/Start")
+        .then(response => {
+            console.log("Starting game...")
+            notify();
+            props.setStart(true);
+        })
+        .catch(error => {
+            console.log(error.response.data);
+            errorNotify("Conexion perdida con el servidor");
+        });
 
     }
 
@@ -246,7 +244,7 @@ export default function ConexionList(props) {
             <Grid item xs={0} md={4} ></Grid>
 
             <Grid item xs={12} md={4} align = "center">
-                <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+                <Typography sx={{ mt: 4, mb: 4 }} variant="h4" component="div">
                     Jugadores conectados
                 </Typography>
             </Grid>
@@ -290,7 +288,7 @@ export default function ConexionList(props) {
                         color="success"
                         disabled = {props.start}
                         onClick = {(e) => {
-                            HandleStartGameClick(props);
+                            HandleStartGameClick();
                         }}
                         >
                             Start

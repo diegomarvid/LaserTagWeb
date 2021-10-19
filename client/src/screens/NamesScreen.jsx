@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -56,6 +57,25 @@ function NamesList(props)
 {
     return (
             <List>
+
+                <ListItem>
+                                  
+                    <ListItemText
+                    primary={ <Typography variant="h5" style={{ color: '#ffffff65', fontWeight: 'bold'  }}>ID</Typography>}
+                    /> 
+
+                    <ListItemText
+                    primary={
+
+                    <Box sx={{ml:-5}}>
+                        <Typography variant="h5" style={{ fontWeight: 'bold'  }}>Nombre</Typography>
+                    </Box>
+                    }
+                    />
+
+                </ListItem>
+
+            <Divider sx = {{bgcolor: "#FFFFFF"}}/>
 
             {props.data.map( (player) => (
 
@@ -182,10 +202,14 @@ export default function InteractiveList(props) {
     }
 
     const SendPlayersNames = () => {
+
+        if(data.length < 2){
+            errorNotify(`Deben haber por lo menos 2 jugadores ingresados.`);
+            return;
+        }
         
         console.log("Envio los nombres: " , data)
-        setLoading(true)
-
+   
         axios.post('/api/SendPlayerNames', {players: data})
         .then( response => {
             setLoading(false);
@@ -247,7 +271,7 @@ export default function InteractiveList(props) {
             <Grid item xs={0} md={4} ></Grid>
 
             <Grid item xs={12} md={4} align = "center">
-                <Typography sx={{ mt: 4, mb: 2 }} variant="h5" component="div">
+                <Typography sx={{ mt: 4, mb: 4 }} variant="h4" component="div">
                     Nombres de los jugadores
                 </Typography>
             </Grid>
