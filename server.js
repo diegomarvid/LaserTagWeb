@@ -183,6 +183,8 @@ app.post('/api/Start', (req, res) =>
 
     db.collection("Teams").find({}).toArray(function(err, teams)
     {
+       
+
         db.collection("Players").find({}).toArray(function(err, players)
         {
             
@@ -194,6 +196,7 @@ app.post('/api/Start', (req, res) =>
             GAME_STARTED = true;
             db.collection("Status").updateOne({id: "started"}, {$set: {status: true}})
             db.collection("Hits").deleteMany({});
+            
 
             res.send({success: true})
         
@@ -699,6 +702,21 @@ function HandleDieTopic()
                         GAME_STARTED = false;
                         db.collection("Status").updateOne({id: "started"}, {$set: {status: false}})
                         client.publish(SendDamageTopic, "");
+
+                        for(let i in teams)
+                        {
+                            let team = teams[i]
+                            console.log(`Setting team [${team.id}] to 0 `)
+
+                            db.collection("Teams").findOneAndUpdate(
+                                { id: team.id},
+                                { $set: { cantidadJugadores: 0 } }, function (err, result){
+                                    if(err) throw err;
+                                    console.log(result)
+                                }
+                            )
+                        }
+
                     }
 
                 })
@@ -798,6 +816,9 @@ function HandleTeamTopic()
 
             console.log(`Equipo viejo: [${playerTeam}] | Equipo nuevo: [${team}]`)
 
+            if(team == playerTeam) return;
+            
+
             //Cambio el equipo del jugador deseado
             db.collection("Players").updateOne(query, {$set: {team: team}}, function (err, result){
         
@@ -821,7 +842,8 @@ function HandleTeamTopic()
                             db.collection("Teams").findOneAndUpdate(
                                 { id: playerTeam},
                                 { $inc: { cantidadJugadores: -1 } }, function (err, result){
-                                    console.log(`Decrementando cantidad de jugadores por 1 en ${playerTeam}`)    
+                                    console.log(`Decrementando cantidad de jugadores por 1 en ${playerTeam}`)
+                                    console.log(result)
                                 }
                             )
                         }
