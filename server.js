@@ -697,6 +697,7 @@ function HandleDieTopic()
                         console.log("Termino el juego");
                         console.log("Gano el equipo " + aliveTeams[0].id);
                         GAME_STARTED = false;
+                        db.collection("Status").updateOne({id: "started"}, {$set: {status: false}})
                         client.publish(SendDamageTopic, "");
                     }
 
@@ -835,22 +836,3 @@ function HandleTeamTopic()
 
 
 }
-
-// const hit = {
-
-//     id: 'c',
-//     Hits: [
-//       { id: 'a', damage: 20 },
-//       { id: 'b', damage: 66 },
-//       { id: 'd', damage: 11 }
-//     ]
-//   }
-
-//   { 
-//     "id": "c",
-//     "Hits": [
-//       { "id": "a", "damage": 10 },
-//       { "id": "b", "damage": 5 },
-//       { "id": "d", "damage": 1 }
-//     ]
-//   }
