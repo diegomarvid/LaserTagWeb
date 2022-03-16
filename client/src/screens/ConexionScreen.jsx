@@ -207,7 +207,20 @@ export default function ConexionList(props) {
  
             try{
                 const result = await axios.post('/api/ReceivePlayers', {});
-                const players = result.data;
+                let players = result.data;
+
+                players = players.sort((player1, player2) => {
+
+                    if(player1.team != undefined && player2.team == undefined) {
+                        return -1;
+                    }
+                    else if(player1.team != undefined && player2.team != undefined)
+                    {
+                        player1.team.localeCompare(player2.team)
+                    }
+                   
+                });
+
                 setData(players);
                 setLoading(false);
                 console.log(players)

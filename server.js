@@ -195,7 +195,7 @@ app.post('/api/Start', (req, res) =>
             client.publish(StartTopic, "started");
             GAME_STARTED = true;
             db.collection("Status").updateOne({id: "started"}, {$set: {status: true}})
-            db.collection("Hits").deleteMany({});
+            //db.collection("Hits").deleteMany({});
             
 
             res.send({success: true})
@@ -235,6 +235,28 @@ app.post('/api/ReceivePlayers', (req, res) =>
             res.send(players)
         })
    })
+
+});
+
+app.post('/api/ReceivePlayersIdName', (req, res) => 
+{
+
+    db.collection("Players").find({}).toArray(function(err, result)
+    {
+        if (err) throw err;
+
+        let players = [];
+
+        for(let i in result)
+        {
+            let player = result[i];
+            players.push({id: player.id, name: player.name});
+        }
+
+        players = players.sort((player1, player2) => player1.id.localeCompare(player2.id));
+
+        res.send(players)
+    })
 
 });
 
@@ -518,7 +540,7 @@ app.post('/api/DamageMadeByPlayer', (req, res) =>
                         //Los damage que me hicieron
                         if(enemyName == playerName)
                         {
-                            console.log("Agrego danos a claudios")
+        
                             let enemy_player_index = total_damage_received.findIndex(x => x.id == hit.id);      
                             if(enemy_player_index != -1){            
                                 total_damage_received[enemy_player_index].damage += hit.damage;

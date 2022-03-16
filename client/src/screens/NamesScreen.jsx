@@ -144,7 +144,7 @@ export default function InteractiveList(props) {
         const receivePlayers = async () => {
             
             try{
-                const result = await axios.post('/api/ReceivePlayers', {});
+                const result = await axios.post('/api/ReceivePlayersIdName', {});
                 const players = result.data;
                 setData(players);
                 setLoading(false);
@@ -209,7 +209,7 @@ export default function InteractiveList(props) {
         }
         
         console.log("Envio los nombres: " , data)
-   
+ 
         axios.post('/api/SendPlayerNames', {players: data})
         .then( response => {
             setLoading(false);
