@@ -195,7 +195,7 @@ app.post('/api/Start', (req, res) =>
             client.publish(StartTopic, "started");
             GAME_STARTED = true;
             db.collection("Status").updateOne({id: "started"}, {$set: {status: true}})
-            //db.collection("Hits").deleteMany({});
+            db.collection("Hits").deleteMany({});
             
 
             res.send({success: true})
